@@ -1,5 +1,5 @@
 ## German SWC placeholder directory
 
-This directory serves as a placeholder for the German Spoken Wikipedia Corpus 2.0
+This directory serves as a placeholder for the German Spoken Wikipedia Corpus 2.0.
 
-Please follow the README.md in the root directory and replace this directory.
+Please follow the `README.md` in the root directory and replace this directory with the corpus.
