@@ -1,6 +1,6 @@
 import csv
 import matplotlib.pyplot as plt
-from keras_classifier import get_ranking_distance
+from keras_rating_classifier import get_ranking_distance
 
 
 with open('../ratings.csv', newline='') as file:
