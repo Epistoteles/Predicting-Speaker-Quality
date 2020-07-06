@@ -30,17 +30,17 @@ embeddings_deleted = 0
 embeddings_created = 0
 
 # Remove outdated embeddings with no matching source in wavs
-for root, dirs, files in os.walk("embeddings"):
-    for d in dirs:
-        embedding = os.path.join(root, d)
-        wav = embedding.replace("embeddings/", "wavs/")
-        if not os.path.exists(wav):
-            os.remove(embedding)
+for root, dirs, files in os.walk("embeddings", topdown=False):
     for f in files:
         embedding = os.path.join(root, f)
         wav = embedding.replace("embeddings/", "wavs/").replace(".p", ".wav")
         if not os.path.exists(wav):
             os.remove(embedding)
+    for d in dirs:
+        embedding_dir = os.path.join(root, d)
+        wav_dir = embedding_dir.replace("embeddings/", "wavs/")
+        if not os.path.exists(wav_dir):
+            os.rmdir(embedding_dir)
 
 # Then create new embeddings for all .wav files that don't already have one
 progressbar = tqdm(total=wavs_total)
