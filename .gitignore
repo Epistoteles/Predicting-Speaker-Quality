@@ -1,4 +1,7 @@
-# ignore the contents of the SWC corpus
+# ignore Jetbrains
+.idea/*
+
+# ignore the contents of the SW corpus
 german/*
 !german/README.md
 

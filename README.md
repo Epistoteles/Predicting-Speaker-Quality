@@ -1,5 +1,8 @@
 # Speech-Quality-Estimation
 
+![Python](https://img.shields.io/badge/python-v3.7+-blue.svg)
+![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
+
 ## Setup
 
 To setup this project, follow the following steps:
