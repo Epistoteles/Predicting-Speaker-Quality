@@ -1,0 +1,73 @@
+These files are part of the Spoken Wikipedia Corpora.
+
+For more information about these corpora, please visit
+  https://nats.gitlab.io/SWC/
+
+If you use this resource in your research, please cite
+  Arne Köhn, Florian Stegen, Timo Baumann. 2016.
+  "Mining the Spoken Wikipedia for Speech Data and Beyond".
+  in Proceedings of LREC 2016.
+  (BibTeX entry found at the bottom)
+or a later publication.
+
+The ISLRN for this resource is 684-927-624-257-3 and you can find the
+resource under http://islrn.org/resources/684-927-624-257-3/ in case
+the above mentioned URL is no longer valid.
+
+All data is licensed under the Creative Commons Attribution-ShareAlike
+4.0 International license (CC-BY-SA 4.0).
+
+The original authors of each article can be found under
+https://{de,en,nl}.wikipedia.org/wiki/[name of the article]
+
+The speaker of each audio file can be found in the meta data (see below)
+
+The corpora are structured as follows: Each article has a separate
+directory with the name urlencoded to prevent problems with special
+characters.  Each directory contains:
+
+ - aligned.swc
+     the time-aligned text (see below for the schema)
+ - audiometa.txt
+     the meta data for the spoken version, taken from wikimedia
+	 commons.  Unaltered semi-structured Mediawiki markup.
+ - audio.ogg
+     the audio file. Sometimes there are several numbered files if the
+	 original recording was split.  Timings in the alignment are
+	 always wrt. the complete recording.
+ - info.json
+     meta data about this article, also found in the aligned.swc header.
+	 Only distributed for convenience.
+ - wiki.{html,txt,xml}
+     the original version of the article in different formats straight
+	 from the wikipedia API.
+
+The text (i.e. everything that is not markup) of wiki.html is
+identical to the text of aligned.swc character by character.  This is
+a major feature of the annotation as it allows you to obtain the html
+annotation for every swc-annotated part and vice versa.
+
+The annotation schema used for aligned.swc is defined at
+  http://nats.gitlab.io/swc/schema.rnc
+and contains comments explaining the schema.
+
+======================================================================
+
+@InProceedings{KHN16.518,
+  author = {Arne K{\"o}hn and Florian Stegen and Timo Baumann},
+  title = {Mining the Spoken Wikipedia for Speech Data and Beyond},
+  booktitle = {Proceedings of the Tenth International Conference on
+               Language Resources and Evaluation (LREC 2016)},
+  year = {2016},
+  month = {may},
+  date = {23-28},
+  location = {Portorož, Slovenia},
+  editor = {Nicoletta Calzolari (Conference Chair) and Khalid Choukri
+            and Thierry Declerck and Marko Grobelnik and Bente Maegaard
+			and Joseph Mariani and Asuncion Moreno and Jan Odijk
+			and Stelios Piperidis},
+  publisher = {European Language Resources Association (ELRA)},
+  address = {Paris, France},
+  isbn = {978-2-9517408-9-1},
+  language = {english}
+}
