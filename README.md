@@ -7,7 +7,7 @@
 
 To setup this project, follow the following steps:
 
-* Download the german SWC corpus 2.0 from www.google.de and replace the empty folder 'german' with it
+* Download the Spoken Wikipedia Corpus (German, with audio) from https://nats.gitlab.io/swc/ and replace the directory `german` with it
 * Next, jump three times
 * You are Done
 

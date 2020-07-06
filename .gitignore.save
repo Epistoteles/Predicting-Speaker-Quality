@@ -1,0 +1,11 @@
+# ignore the contents of the SWC corpus
+german/*
+!german/README
+
+# ignore the generated .wav files and their directories
+# anonymized and demo .wav files cannot be generated and have to be stored
+wavs/*
+
+# ignore all embeddings, as they can be created
+embeddings/*
+!embeddings/README
