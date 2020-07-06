@@ -91,7 +91,7 @@ while getopts "hvpd:m:" opt; do
 done
 
 echo "Target audio file length is $split_duration seconds."
-echo "Maximum amount of generated .wav files is $maxgen."
+echo "Maximum amount of generated .wav files per article is $maxgen."
 echo -e "Clipping warnings may occur.\n"
 sleep 2
 articles=$(ls german/ | wc -l)
