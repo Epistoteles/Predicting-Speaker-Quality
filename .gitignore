@@ -1,4 +1,4 @@
-encoder/
+encoder/*
 
 # ignore the contents of the SWC corpus
 german/*
