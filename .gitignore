@@ -1,0 +1,12 @@
+encoder/
+
+# ignore the contents of the SWC corpus
+german/*
+
+# ignore the generated .wav files and their directories
+# anonymized and demo .wav files cannot be generated and have to be stored
+wavs/!(anonymized|demo)
+wavs/*
+
+# ignore all embeddings, as they can be created
+embeddings/*

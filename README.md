@@ -1,6 +1,6 @@
-### Setup
-## Hello
-# Demo
+# Speech-Quality-Estimation
+
+## Setup
 
 To setup this project, follow the following steps:
 
