@@ -10,33 +10,33 @@ function log () {
 }
 
 function split_audio () {
-	if [[ $(ls $1*.ogg | grep -v "audio.ogg" | wc -l) -gt 0 ]] && [ ! -f $1audio.ogg ]; then # Some recordings are split up into audio1.ogg, audio2.ogg, ...
+	if [[ $(ls "$1"*.ogg | grep -v "audio.ogg" | wc -l) -gt 0 ]] && [ ! -f "$1"audio.ogg ]; then # Some recordings are split up into audio1.ogg, audio2.ogg, ...
     echo "   🔗 Concatenating recordings"
     for f in $1*.ogg; do
       sox $f $f channels 1
     done
-    sox $(ls $1*.ogg) $1audio.ogg
+    sox $(ls "$1"*.ogg) "$1"audio.ogg
   else
-    if [[ $(ls $1*.ogg | wc -l) -eq 0 ]]; then # Some dirs are empty :(
+    if [[ $(ls "$1"*.ogg | wc -l) -eq 0 ]]; then # Some dirs are empty :(
       echo "   ❌ Empty directory $1 found"
       emptydirs+="   $1\n"
       return
     fi
 	fi
-	reader=$(grep -Po '(?<="reader":")([^",]*)(?=")' $1info.json | head -1 | tr -dc "[:alnum:]")
+	reader=$(grep -Po '(?<="reader":")([^",]*)(?=")' "$1"info.json | head -1 | tr -dc "[:alnum:]" | tr '[:upper:]' '[:lower:]')
   if [ -z "$reader" ]; then # Some recordings don't have a reader specified
     echo "   🗣️ No reader specified in info.json. Skipping article."
     noreaders+="   $1\n"
     return
   fi
 	log "Reader: $reader"
-  title=$(grep -Po '(?<="title":")([^",]*)(?=")' $1info.json | head -1 | tr -dc "[:alnum:]")
+  title=$(grep -Po '(?<="title":")([^",]*)(?=")' "$1"info.json | head -1 | tr -dc "[:alnum:]" | tr '[:upper:]' '[:lower:]')
 	log "Title: $title"
   if [ -d wavs/split-"$split_duration"/"$reader"/"$title" ]; then # Don't generate already split audio again
     echo "   ✅ Already generated $title"
     return
   fi
-	duration=$(sox --i -D $1audio.ogg)
+	duration=$(sox --i -D "$1"audio.ogg)
 	log "Duration: $duration s"
 	num_files=$((${duration%.*} / $split_duration))
   num_files=$([[ $num_files -lt $maxgen ]] && echo "$num_files" || echo "$maxgen")
@@ -46,7 +46,7 @@ function split_audio () {
     start=$((($i - 1) * $split_duration))
     end=$(($i * $split_duration))
 		log "    Generating $i.wav from second $start to $end"
-		sox -v 0.95 $1audio.ogg wavs/split-$split_duration/"$reader"/"$title"/$i.wav trim $start $split_duration channels 1 rate 16000
+		sox -v 0.95 "$1"audio.ogg wavs/split-"$split_duration"/"$reader"/"$title"/"$i".wav trim $start "$split_duration" channels 1 rate 16000
 	done
   echo "   ✔️ Split up $title by $reader"
 }
@@ -97,7 +97,7 @@ sleep 2
 articles=$(ls german/ | wc -l)
 counter=0
 for d in german/*/; do
-    let "counter++"
+    ((counter++))
     if [[ "$progress" -eq 1 ]]; then
       echo -e "Processing dir $counter/$articles ($d)"
     fi
