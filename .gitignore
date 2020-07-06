@@ -1,6 +1,9 @@
 # ignore Jetbrains
 .idea/*
 
+# ignore wandb
+wandb/*
+
 # ignore the contents of the SW corpus
 german/*
 !german/README.md
