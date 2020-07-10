@@ -33,7 +33,7 @@ embeddings_created = 0
 for root, dirs, files in os.walk("embeddings", topdown=False):
     for f in files:
         embedding = os.path.join(root, f)
-        wav = embedding.replace("embeddings/", "wavs/").replace(".p", ".wav")
+        wav = embedding.replace("embeddings/", "wavs/").replace(".pickle", ".wav")
         if not os.path.exists(wav):
             os.remove(embedding)
     for d in dirs:
@@ -52,7 +52,7 @@ for root, dirs, files in os.walk(dir_to_update):
     for f in files:
         wav_path = os.path.join(root, f)
         if wav_path.endswith(".wav"):
-            embedding_path = wav_path.replace("wavs/", "embeddings/").replace(".wav", ".p")
+            embedding_path = wav_path.replace("wavs/", "embeddings/").replace(".wav", ".pickle")
             if os.path.isfile(embedding_path):
                 embeddings_not_modified += 1
             else:
