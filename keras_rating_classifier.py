@@ -14,10 +14,12 @@ utils = __import__('227_utils')
 
 LEARNING_RATE = 0.0005
 BATCH_SIZE = 50
-EPOCHS = 250
+EPOCHS = 200
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
 ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.4
+VAL_SPLIT = 0.1
+MODEL_DEPTH = 8  # Amount of dense layers
 EMBEDDING_TYPE = "embeddings"  # embeddings, embeddings-unspeech (embeddings dir name)
 TRAINING_DATA = "anonymized"  # anonymized, split-10, ... (subdir name in wavs dir)
 AUGMENTATION_BY_INVERSION = False  # Double the amount of data by inverting the order of each rating?
@@ -30,11 +32,13 @@ wandb.init(
             "optimizer": OPTIMIZER,
             "activation_func": ACTIVATION_FUNC,
             "dropout_rate": DROPOUT_RATE,
+            "val_split": VAL_SPLIT,
+            "model_depth": MODEL_DEPTH,
             "embedding_type": EMBEDDING_TYPE,
             "training_data": TRAINING_DATA,
             "augmentation_by_inversion": AUGMENTATION_BY_INVERSION,
             "test_set_min_size": TEST_SET_MIN_SIZE},
-    project=["Speech-Quality-Classifier-ratings"]
+    project="SQE-ratings"
 )
 
 
@@ -108,15 +112,10 @@ model = Sequential()
 model.add(Dense(256, input_dim=256))
 model.add(Activation(ACTIVATION_FUNC))
 model.add(Dropout(DROPOUT_RATE))
-model.add(Dense(256, kernel_constraint=maxnorm(3)))
-model.add(Activation(ACTIVATION_FUNC))
-model.add(Dropout(DROPOUT_RATE))
-model.add(Dense(256, kernel_constraint=maxnorm(3)))
-model.add(Activation(ACTIVATION_FUNC))
-model.add(Dropout(DROPOUT_RATE))
-model.add(Dense(256, kernel_constraint=maxnorm(3)))
-model.add(Activation(ACTIVATION_FUNC))
-model.add(Dropout(DROPOUT_RATE))
+for i in range(MODEL_DEPTH - 5):
+    model.add(Dense(256, kernel_constraint=maxnorm(3)))
+    model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dropout(DROPOUT_RATE))
 model.add(Dense(128, kernel_constraint=maxnorm(3)))
 model.add(Activation(ACTIVATION_FUNC))
 model.add(Dense(64, kernel_constraint=maxnorm(3)))
@@ -136,7 +135,14 @@ switcher = {
 
 model.compile(loss='binary_crossentropy', optimizer=switcher.get(OPTIMIZER), metrics=["binary_accuracy"])
 
-model.fit(train_data, train_labels, batch_size=BATCH_SIZE, nb_epoch=EPOCHS, callbacks=[WandbCallback()])
+model.fit(
+    train_data,
+    train_labels,
+    batch_size=BATCH_SIZE,
+    nb_epoch=EPOCHS,
+    callbacks=[WandbCallback()],
+    validation_split=VAL_SPLIT
+)
 
 print("\nPrediction accuracies based on embeddings:")
 for test_set, name in zip(test_sets, test_set_names):
