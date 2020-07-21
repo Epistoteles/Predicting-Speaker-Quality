@@ -1,0 +1,24 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish "$0" "$@"
+
+package require snack
+
+snack::sound s
+
+foreach file $argv {
+ s read $file
+ puts $file
+ regsub -- {\..{2,4}$} $file "" file
+ set fd [open $file.pitch.esps w]
+ foreach line [s pitch -method esps] {
+  if { [lindex $line 0] == 0.0 } {
+   lset line 0 -1
+  }
+  puts $fd [lindex $line 0]
+ }
+ close $fd
+}
+
+exit
+
