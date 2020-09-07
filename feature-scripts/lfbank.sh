@@ -1,4 +1,7 @@
-for file in ../wavs/anonymized/random000.wav
-do
-	./lfbank.py $file > "${file%%.wav}".lfbank
-done
+#!/bin/bash
+
+file=$1
+destination=$2
+
+./lfbank.py $file > "$destination".lfbank
+

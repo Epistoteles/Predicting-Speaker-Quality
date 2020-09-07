@@ -1,0 +1,83 @@
+# ==+====1====+====2====+====3====+====4====+====5====+====6====+====7====+====8====+====9====+====0
+# 
+# Copyright (c) 2009, Kornel Laskowski
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification, are permitted
+# provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright notice, this list of
+#      conditions and the following disclaimer.
+#    * Redistributions in binary form must reproduce the above copyright notice, this list of
+#      conditions and the following disclaimer in the documentation and/or other materials provided
+#      with the distribution.
+#    * Neither the name of Carnegie Mellon University nor the names of its contributors may be used
+#      to endorse or promote products derived from this software without specific prior written
+#      permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+# OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# ==+====1====+====2====+====3====+====4====+====5====+====6====+====7====+====8====+====9====+== */
+
+#
+# filterbank.sample2
+#
+# A sample ffv filter, firsts-ever ffv version supporting external filterbank specification
+# (29.07.2009). This is an alternate definition to filterbank.sample1.
+#
+# This file MUST contain a exactly one line whose first token is "TSEPREF", of two fields separated
+# by whitespace. The second field in this line is a double representing the temporal separation, in
+# seconds, between two instants. The filterbank structure in this file characterizes the variation
+# in fundamental frequency (for harmonic timeseries) observable for that separation. the TSEPREF
+# value need not be the same as the tsep value with which ffv is called --- the program will
+# internally compensate for discrepancy. This allows for the independent modification of parameters.
+#
+
+TSEPREF 0.008
+
+#
+# This file MUST also contain a single line whose first entry is "NINPUT", of two fields separated
+# by whitespace. The second field in this line is a positive integer representing the number of
+# discrete points at which g[], the FFV spectrum, will be computed. Note that the first sample
+# point will correspond to a change of -2 octaves per TSEPREF value, while the last sample will
+# correspond to a change of +2 octaves per TSEPREF value.
+#
+
+NINPUT 512
+
+#
+# This file MUST also contain a single line whose first entry is "NFILTER", of two fields separated
+# by whitespace. The second field in this line is a positive integer representing the number of
+# filters in the filterbank.
+#
+
+NFILTER 7
+
+#
+# This file MUST also contain as many lines as there are filters, each containing first the token
+# "FILTER", then the 0-offset index of the filter, then the number of samples in the support of the
+# filter, and then as many pairs of (x,y) values as there are samples. The "x" value is the 1-offset
+# sample identifier in NINPUT samples (with NINPUT/2 corresponding to 0 octaves per TSEPREF seconds).
+# The "y" value represents the weight of that sample in the output of the filter. Note that after the
+# values are read, all "y" values per filter will be summed and each sample weight will be normalized
+# by dividing by this sum. The specified "y" weights are therefore only relative.
+#
+# NOTE: "y" may be negative; however, at this time, if the sum for all samples in a filter turns out
+# to be 0, the program will abort. In the future, the sample weights should be normalized by the
+# square root of the sum of squares, rather than by the sum.
+#
+
+FILTER 0 23 117 1.0 118 1.0 119 1.0 120 1.0 121 1.0 122 1.0 123 1.0 124 1.0 125 1.0 126 1.0 127 1.0 128 1.0 129 1.0 130 1.0 131 1.0 132 1.0 133 1.0 134 1.0 135 1.0 136 1.0 137 1.0 138 1.0 139 1.0
+FILTER 1  7 245 0.5 246 1.0 247 1.0 248 1.0 249 1.0 250 1.0 251 0.5
+FILTER 2  7 249 0.5 250 1.0 251 1.0 252 1.0 253 1.0 254 1.0 255 0.5
+FILTER 3  5 254 0.6 255 0.8 256 1.0 257 0.8 258 0.6
+FILTER 4  7 257 0.5 258 1.0 259 1.0 260 1.0 261 1.0 262 1.0 263 0.5
+FILTER 5  7 261 0.5 262 1.0 263 1.0 264 1.0 265 1.0 266 1.0 267 0.5
+FILTER 6 23 373 1.0 374 1.0 375 1.0 376 1.0 377 1.0 378 1.0 379 1.0 380 1.0 381 1.0 382 1.0 383 1.0 384 1.0 385 1.0 386 1.0 387 1.0 388 1.0 389 1.0 390 1.0 391 1.0 392 1.0 393 1.0 394 1.0 395 1.0

@@ -1,4 +1,6 @@
-for file in ../wavs/anonymized/random000.wav
-do
-  ./compute-mfcc/compute-mfcc --input "$file" --output "${file%%.wav}".mfc
-done
+#!/bin/bash
+
+file=$1
+destination=$2
+
+./compute-mfcc/compute-mfcc --input "$file" --output "$destination".mfc

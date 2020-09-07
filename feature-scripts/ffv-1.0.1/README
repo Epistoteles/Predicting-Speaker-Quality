@@ -1,0 +1,192 @@
+Fundamental Frequency Variation (FFV): Normative Implementation
+
+Copyright (c) 2009, Kornel Laskowski
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted
+provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of
+      conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of
+      conditions and the following disclaimer in the documentation and/or other materials provided
+      with the distribution.
+    * Neither the name of Carnegie Mellon University nor the names of its contributors may be used
+      to endorse or promote products derived from this software without specific prior written
+      permission.
+ 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+====+====1====+====2====+====3====+====4====+====5====+====6====+====7====+====8====+====9====+====0
+
+*** 1. References
+
+The FFV representation is an instantaneous-frame representation of variation in fundamental
+frequency, and is intended to model at the sub-unit level intonation trajectories, in the same
+way that standard MFCC features model formant trajectories at the sub-unit level.
+
+This representation was introduced in
+
+[1] Kornel Laskowski, Jens Edlund, and Mattias Heldner (2008), "An Instantaneous Vector
+Representation of Delta Pitch for Speaker-Change Prediction in Conversational Dialogue Systems". In
+proceedings of the 33rd IEEE International Conference on Acoustics, Speech, and Signal Processing
+(ICASSP2008), Las Vegas NV, USA, 30 March - 04 April, pp5041-5044,
+
+and an overview is available in
+
+[3] Kornel Laskowski, Mattias Heldner, and Jens Edlund (2008), "The Fundamental Frequency
+Variation Spectrum". In proceedings of the 21st Swedish Phonetics Conference (Fonetik 2008),
+Gothenburg, Sweden, 11-13 June, pp29-32.
+
+Several computational refinements are described in
+
+[4] Kornel Laskowski, Matthias Wölfel, Mattias Heldner, and Jens Edlund (2008), "Computing the
+Fundamental Frequency Variation Spectrum in Conversational Spoken Dialogue Systems". In proceedings
+of the 155th Meeting of the Acoustical Society of America, 5th EAA Forum Acusticum, and 9th SFA
+Congrés Français d'Acoustique (Acoustics2008), Paris, France, 29 June - 04 July, pp3305-3310; and
+
+[8] Kornel Laskowski, Mattias Heldner and Jens Edlund (2009), "A General-Purpose 32 ms Prosodic
+Vector for Hidden Markov Modeling", to appear at the 10th Annual Conference of the International
+Speech Communication Association (INTERSPEECH2009), Brighton, UK, 6-10 September. 
+
+Demonstrations of inferred model structure over the representation are available in
+
+[2] Kornel Laskowski, Jens Edlund, and Mattias Heldner (2008), "Learning Prosodic Sequences Using
+the Fundamental Frequency Variation Spectrum". In proceedings of the 4th ISCA International
+Conference on Speech Prosody (SP2008), Campinas, Brazil, 06-09 May;
+
+[5] Mattias Heldner, Jens Edlund, Kornel Laskowski, and Antoine Pelcé (2008), "Prosodic Features in
+the Vicinity of Silences and Overlaps". to appear in proceedings of the 10th Nordic Conference on
+Prosody, Helsinki, Finland, 04-06 August; and
+
+[7] Kornel Laskowski, Mattias Heldner and Jens Edlund (2009), "Exploring the Prosody of Floor
+Mechanisms in English Using the Fundamental Frequency Variation Spectrum", to appear at the 17th
+European Signal Processing Conference (EUSIPCO2009), Glasgow, UK, 24-28 August.
+
+Finally, application of the FFV representation to speaker recognition is described in
+
+[6] Kornel Laskowski and Qin Jin (2009), "Modeling Instantaneous Intonation for Speaker Identification
+Using the Fundamental Frequency Variation Spectrum". In proceedings of the 34th IEEE International
+Conference on Acoustics, Speech, and Signal Processing (ICASSP2009), Taipei, Taiwan, 19-24 April,
+pp4541-4544.
+
+====+====1====+====2====+====3====+====4====+====5====+====6====+====7====+====8====+====9====+====0
+
+*** 2. Building
+
+The distribution consists of 
+
+	(this README)
+	windowpair.[hc]
+	filterbank.[hc]
+	filterbank.sample[12]
+	dcorrxform.[hc]
+	mutils.[hc]
+	sutils.[hc]
+	ffv.[hc]
+	ffv_main.c
+	Makefile
+
+To build the single executable "ffv", type "make all" in the directory containing the source.
+
+====+====1====+====2====+====3====+====4====+====5====+====6====+====7====+====8====+====9====+====0
+
+*** 3. Running
+
+./ffv [ --fs FS ] \
+	[ --tfra TFRA ] \
+	[ --tint TINT ] [ --text TEXT ] [ --tsep TSEP ] [ --winShape WINSHAPE ] \
+	[ --fbFileName FBFILENAME ] \
+	[ -- dcorrxformType DCORRXFORMTYPE ] [ --nOutput NOUTPUT ] \
+	INFILENAME
+	[ OUTLOCNAME ]
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0
+
+	General Parameters:
+
+FS : input-file sampling frequency, in Hertz (default value: 16000)
+TFRA : desired frame step, in seconds (default value: 0.008)
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0
+
+	Windowing Parameters:
+
+TINT : width of window function from peak towards the center of the two-window frame
+	(default value: 0.011)
+TEXT : width of window function from peak away from the center of the two-window frame
+	(default value: 0.009
+TSEP : separation between peaks of the two window functions (default value: 0.014)
+WINSHAPE : one of
+		- "hamming_hamming"
+		- "hann_hann"
+		- "hamming_hann"
+	where "a" in the "a_b" format above indicates the internal edge of the window function and
+	"b" indicates the external edge (defalt value: "hamming_hann")
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0
+
+	Filterbank Parameters:
+
+FBFILENAME : name of file specifying filterbank parameters, including
+		- duration of instant over which variation is measured (TSEPREF)
+		- granularity of FFV spectrum sampling (NINPUT)
+		- number of filterbank filters (NFILTER)
+		- individual filter structure (FILTER)
+	See filterbank.sample1 for the filterbank definition which is the default filterbank
+	when the fbFileName option is left unspecified.
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0
+
+	Decorrelation Parameters:
+
+DCORRXFORMTYPE : one of
+		- "data"
+	(default value: "data")
+
+NOUTPUT : integer number of post-transform outputs to retain (default: all)
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0
+
+	Filenames:
+
+INFILENAME : name of RIFF wave file; however, the header is not parsed. the following
+	characteristics are assumed:
+		- two-byte (16bit), signed (two's complement) integer samples
+		- no compression, little-endian encoding
+		- single channel
+	the header is assumed to be 44 bytes long, and is skipped.
+
+OUTLOCNAME : optional output location. output is written to an OUTFILENAME created in
+	the following way:
+	1. if OUTLOCNAME is specified, and the file system object is absent,
+
+		OUTFILENAME = OUTLOCNAME.
+
+	2. if OUTLOCNAME is specified, the file system object is present, and is a directory,
+
+		OUTFILENAME = OUTLOCNAME . "/" . INFILENAME . ".txt"
+
+	   if OUTFILENAME already exists, the program aborts.
+
+	3. if OUTLOCNAME is specified, the file system object is present, and is not a
+	   directory, the program aborts.
+
+	4. if OUTLOCNAME is not specified,
+
+		OUTFILENAME = INFILENAME . ".txt"
+
+	   if OUTFILENAME already exists, the program aborts.
+
+====+====1====+====2====+====3====+====4====+====5====+====6====+====7====+====8====+====9====+====0
+
+*** 4. Reporting errors: kornel@cs.cmu.edu
+
+

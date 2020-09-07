@@ -1,1 +1,6 @@
-./snack_esps ../wavs/anonymized/random000.wav
+#!/bin/bash
+
+file=$1
+destination=$2
+
+./snack_esps $file

@@ -10,6 +10,7 @@ foreach file $argv {
  s read $file
  puts $file
  regsub -- {\..{2,4}$} $file "" file
+ regsub -- {\<wavs\>} $file feature-streams file
  set fd [open $file.pitch.esps w]
  foreach line [s pitch -method esps] {
   if { [lindex $line 0] == 0.0 } {

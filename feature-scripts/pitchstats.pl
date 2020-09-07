@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I/informatik2/nats/home/baumann/perl5/lib/perl5/
+#!/usr/bin/perl
+
 use strict;
 use warnings;
 use Statistics::Lite qw(:all);
