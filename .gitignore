@@ -4,7 +4,7 @@
 # ignore wandb
 wandb/*
 
-# ignore the contents of the SW corpus
+# ignore the contents of the SW corpus, as it can be downloaded from somewhere else
 german/*
 !german/README.md
 
@@ -14,6 +14,10 @@ wavs/*
 !wavs/anonymized/
 !wavs/demo/
 
-# ignore all embeddings, as they can be created
-embeddings/*
+# ignore all features, as they can be created
+embeddings-ge2e/*
 !embeddings/README.md
+embeddings-trill/*
+!embeddings-trill/README.md
+feature-streams/*
+!feature-streams/README.md

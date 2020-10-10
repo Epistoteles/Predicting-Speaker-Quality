@@ -3,10 +3,11 @@ import numpy as np
 import random
 import os
 import pickle
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
-from keras.optimizers import SGD, Adam, Adamax, Adagrad, Nadam
-from keras.constraints import maxnorm
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation, Dropout
+from tensorflow.keras.optimizers import SGD, Adam, Adamax, Adagrad, Nadam
+from tensorflow.keras.constraints import MaxNorm
 import wandb
 from wandb.keras import WandbCallback
 from sklearn.utils import shuffle
@@ -15,14 +16,14 @@ utils = __import__('227_utils')
 
 LEARNING_RATE = 0.0000005
 BATCH_SIZE = 10
-EPOCHS = 100
+EPOCHS = 25
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
 ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
 VAL_SPLIT = 0.1
 LOSS = "mean_squared_error"
-EMBEDDING_TYPE = "embeddings"  # embeddings, embeddings-unspeech (embeddings dir name)
-TRAINING_DATA = "split-10"  # split-10, ... (subdir name in wavs dir)
+EMBEDDING_TYPE = "embeddings-ge2e"  # embeddings-ge2e, embeddings-trill (embeddings dir name)
+TRAINING_DATA = "split-10"  # split-10, ... (subdir name in ./wavs)
 
 wandb.init(
     config={"learning_rate": LEARNING_RATE,
@@ -49,6 +50,8 @@ speakers = []
 articles = []
 qualities = []
 
+print(os.path.join(EMBEDDING_TYPE, TRAINING_DATA))
+
 for root, dirs, files in os.walk(os.path.join(EMBEDDING_TYPE, TRAINING_DATA)):
     root_list = root.split("/")
     if len(root_list) == 4:
@@ -56,7 +59,7 @@ for root, dirs, files in os.walk(os.path.join(EMBEDDING_TYPE, TRAINING_DATA)):
         speaker_quality = speaker_to_quality_dict[speaker]
         if speaker in speaker_to_quality_dict and speaker_quality >= 0:
             for f in files:
-                if f.endswith(".p"):  # TODO replace with .pickle
+                if f.endswith(".pickle"):
                     embedding = pickle.load(open(os.path.join(root, f), "rb"))
                     embeddings.append(embedding)
                     speakers.append(speaker)
@@ -67,14 +70,17 @@ print("done generating lists")
 print(len(qualities))
 
 external_indices = set()
+external_speakers = set()
 
 while len(external_indices) < 0.1 * len(qualities):
     external_speaker = random.sample(set(speakers), 1)[0]
     for i, s in enumerate(speakers):
         if s == external_speaker:
             external_indices.add(i)
+            external_speakers.add(external_speaker)
 
-print("# external_indices: " + str(len(external_indices)))
+print("# of external_indices: " + str(len(external_indices)))
+print("external_speakers: " + str(external_speakers))
 
 x_train = []
 y_train = []
@@ -108,18 +114,18 @@ model = Sequential()
 model.add(Dense(256, input_dim=256))
 model.add(Activation(ACTIVATION_FUNC))
 model.add(Dropout(DROPOUT_RATE))
-model.add(Dense(256, kernel_constraint=maxnorm(3)))
+model.add(Dense(256, kernel_constraint=MaxNorm(3)))
 model.add(Activation(ACTIVATION_FUNC))
 model.add(Dropout(DROPOUT_RATE))
-model.add(Dense(256, kernel_constraint=maxnorm(3)))
+model.add(Dense(256, kernel_constraint=MaxNorm(3)))
 model.add(Activation(ACTIVATION_FUNC))
 model.add(Dropout(DROPOUT_RATE))
-model.add(Dense(256, kernel_constraint=maxnorm(3)))
+model.add(Dense(256, kernel_constraint=MaxNorm(3)))
 model.add(Activation(ACTIVATION_FUNC))
 model.add(Dropout(DROPOUT_RATE))
-model.add(Dense(128, kernel_constraint=maxnorm(3)))
+model.add(Dense(128, kernel_constraint=MaxNorm(3)))
 model.add(Activation(ACTIVATION_FUNC))
-model.add(Dense(64, kernel_constraint=maxnorm(3)))
+model.add(Dense(64, kernel_constraint=MaxNorm(3)))
 model.add(Activation(ACTIVATION_FUNC))
 model.add(Dense(32))
 model.add(Activation(ACTIVATION_FUNC))
@@ -141,7 +147,7 @@ model.fit(
     y_train,
     # validation_split=VAL_SPLIT,
     batch_size=BATCH_SIZE,
-    nb_epoch=EPOCHS,
+    epochs=EPOCHS,
     validation_data=(x_test, y_test),
     callbacks=[WandbCallback()]
 )
