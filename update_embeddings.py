@@ -27,7 +27,7 @@ def create_embedding(path):
             sys.exit(f"{path} does not have sample rate of 16000")
         emb = module(samples=np.array(data, dtype=float), sample_rate=16000)['embedding']
         emb.shape.assert_is_compatible_with([None, 2048])
-        return emb
+        return emb.numpy()
 
 
 if EMBEDDING_TYPE not in {"ge2e", "trill"}:

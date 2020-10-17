@@ -49,7 +49,7 @@ def get_folds(embedding_type, dataset, folds=10, seed=None):
                             embedding = pickle.load(
                                 open(os.path.join(root.replace('wavs/', f'{embedding_type}/'), f'{section}.pickle'), 'rb'))
                             samples.append(
-                                Sample(speaker, article, section, embedding=embedding, embedding_type=embedding_type))
+                                Sample(speaker, article, section, embedding=np.mean(embedding, axis=0), embedding_type=embedding_type))
                         else:
                             samples.append(Sample(speaker, article, section))
 
@@ -206,15 +206,15 @@ def generator_test(seed):
     return size_val_stdev
 
 
-print(generator_test(692))
+# print(generator_test(21))
 
-best_seed = 0
-lowest_stdev = 100000
-
-for i in range(1000):
-    curr_stdev = generator_test(i)
-    if curr_stdev < lowest_stdev:
-        lowest_stdev = curr_stdev
-        best_seed = i
-    print(f'currently best seed: {best_seed}')
-    print(f'currently lowest stdev: {lowest_stdev}')
+# best_seed = 0
+# lowest_stdev = 100000
+#
+# for i in range(1000):
+#     curr_stdev = generator_test(i)
+#     if curr_stdev < lowest_stdev:
+#         lowest_stdev = curr_stdev
+#         best_seed = i
+#     print(f'currently best seed: {best_seed}')
+#     print(f'currently lowest stdev: {lowest_stdev}')
