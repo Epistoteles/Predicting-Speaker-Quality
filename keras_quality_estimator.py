@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation, Dropout
+from tensorflow.keras.layers import Dense, Activation, Dropout, Bidirectional, LSTM
 from tensorflow.keras.optimizers import SGD, Adam, Adamax, Adagrad, Nadam
 from tensorflow.keras.constraints import MaxNorm
 from tensorflow.keras.callbacks import EarlyStopping, History
@@ -25,6 +25,7 @@ ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 LOSS = "mean_squared_error"
+USE_LSTM = True
 EMBEDDING_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill (embeddings dir name)
 TRAINING_DATA = "split-10"  # split-10, ... (subdir name in ./wavs)
 
@@ -72,7 +73,10 @@ for i in range(1, CROSS_VAL + 1):
             model.add(Activation(ACTIVATION_FUNC))
             model.add(Dropout(DROPOUT_RATE))
         else:
-            model.add(Dense(2048, input_dim=2048))
+            if USE_LSTM:
+                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048)), merge_mode='ave'))
+            else:
+                model.add(Dense(2048, input_dim=2048))
             model.add(Activation(ACTIVATION_FUNC))
             model.add(Dropout(DROPOUT_RATE))
             model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
@@ -112,6 +116,11 @@ for i in range(1, CROSS_VAL + 1):
 
         model.compile(loss=LOSS, optimizer=switcher.get(OPTIMIZER))
 
+        model.build((None, 2048, 54))
+        model.summary()
+
+        exit()
+
         history = model.fit(
             x_train,
             y_train,
@@ -127,7 +136,7 @@ for i in range(1, CROSS_VAL + 1):
         )
 
         print(f'History: {history.history}')
-        best_loss_per_fold += [history.history['val_loss'][-3]]
+        best_loss_per_fold += [min(history.history['val_loss'])]
         print(best_loss_per_fold)
         print(f'Average best loss:{mean(best_loss_per_fold)}')
 
