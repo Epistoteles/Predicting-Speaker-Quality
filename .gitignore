@@ -21,7 +21,7 @@ wavs/*
 
 # ignore all features, as they can be created
 embeddings-ge2e/*
-!embeddings/README.md
+!embeddings-ge2e/README.md
 embeddings-trill/*
 !embeddings-trill/README.md
 feature-streams/*
