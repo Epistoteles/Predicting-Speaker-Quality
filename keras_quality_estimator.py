@@ -11,7 +11,7 @@ from statistics import mean
 from human_id import generate_id
 import os
 
-os.environ['WANDB_MODE'] = 'dryrun'
+# os.environ['WANDB_MODE'] = 'dryrun'
 
 from cross_validation_generator import get_folds
 
@@ -25,14 +25,14 @@ ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 LOSS = "mean_squared_error"
-USE_LSTM = True
+USE_LSTM = False
 EMBEDDING_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill (embeddings dir name)
 TRAINING_DATA = "split-10"  # split-10, ... (subdir name in ./wavs)
 
-generator = get_folds(EMBEDDING_TYPE, TRAINING_DATA, CROSS_VAL, seed=21)
+generator = get_folds(EMBEDDING_TYPE, TRAINING_DATA, USE_LSTM, CROSS_VAL, seed=21)
 run_name = generate_id(word_count=3)
 
-print(f"Starting run {'-'.join(run_name)} ...")
+print(f"Starting run {run_name} ...")
 
 best_loss_per_fold = []
 
@@ -122,7 +122,7 @@ for i in range(1, CROSS_VAL + 1):
         model.build((None, 2048, 54))
         model.summary()
 
-        exit()
+        # exit()
 
         history = model.fit(
             x_train,

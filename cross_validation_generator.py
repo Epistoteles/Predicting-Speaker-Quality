@@ -14,7 +14,7 @@ np.set_printoptions(precision=3)
 MAX_PER_SPEAKER = 100
 
 
-def get_folds(embedding_type, dataset, folds=10, seed=None):
+def get_folds(embedding_type, dataset, timeseries=False, folds=10, seed=None):
     """
     Takes in the embedding type to use as well as the dataset to use
     and returns folds times a train set and val set with data and labels
@@ -49,7 +49,7 @@ def get_folds(embedding_type, dataset, folds=10, seed=None):
                             embedding = pickle.load(
                                 open(os.path.join(root.replace('wavs/', f'{embedding_type}/'), f'{section}.pickle'), 'rb'))
                             samples.append(
-                                Sample(speaker, article, section, embedding=np.mean(embedding, axis=0), embedding_type=embedding_type))
+                                Sample(speaker, article, section, embedding=embedding if timeseries else np.mean(embedding, axis=0), embedding_type=embedding_type))
                         else:
                             samples.append(Sample(speaker, article, section))
 
