@@ -25,7 +25,7 @@ ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 LOSS = "mean_squared_error"
-USE_LSTM = False
+USE_LSTM = True
 EMBEDDING_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill (embeddings dir name)
 TRAINING_DATA = "split-10"  # split-10, ... (subdir name in ./wavs)
 
@@ -119,8 +119,8 @@ for i in range(1, CROSS_VAL + 1):
 
         model.compile(loss=LOSS, optimizer=switcher.get(OPTIMIZER))
 
-        model.build((None, 2048, 54))
-        model.summary()
+        # model.build((None, 2048, 54))
+        # model.summary()
 
         # exit()
 
