@@ -8,7 +8,7 @@ import wandb
 from wandb.keras import WandbCallback
 from sklearn.utils import shuffle
 from statistics import mean
-import hruid
+from human_id import generate_id
 import os
 
 os.environ['WANDB_MODE'] = 'dryrun'
@@ -30,7 +30,7 @@ EMBEDDING_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill (embedd
 TRAINING_DATA = "split-10"  # split-10, ... (subdir name in ./wavs)
 
 generator = get_folds(EMBEDDING_TYPE, TRAINING_DATA, CROSS_VAL, seed=21)
-run_name = hruid.Generator().random().split('-')[1:3]
+run_name = generate_id(word_count=3)
 
 print(f"Starting run {'-'.join(run_name)} ...")
 
@@ -74,7 +74,10 @@ for i in range(1, CROSS_VAL + 1):
             model.add(Dropout(DROPOUT_RATE))
         else:
             if USE_LSTM:
-                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048)), merge_mode='ave'))
+                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048)), merge_mode='concat'))
+                model.add(Activation(ACTIVATION_FUNC))
+                model.add(Dropout(DROPOUT_RATE))
+                model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
             else:
                 model.add(Dense(2048, input_dim=2048))
             model.add(Activation(ACTIVATION_FUNC))
