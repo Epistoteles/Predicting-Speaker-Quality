@@ -50,7 +50,7 @@ for i in range(1, CROSS_VAL + 1):
                 "training_data": TRAINING_DATA},
         project="SQE-quality",
         reinit=True,
-        name=f"{'-'.join(run_name + [str(i)])}/{CROSS_VAL}"
+        name=f"{run_name}-{i}/{CROSS_VAL}"
     )
 
     print('--------------------------------')
