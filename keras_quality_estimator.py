@@ -11,15 +11,15 @@ from statistics import mean
 from human_id import generate_id
 import os
 
-os.environ['WANDB_MODE'] = 'dryrun'
+# os.environ['WANDB_MODE'] = 'dryrun'
 
 from cross_validation_generator import get_folds
 
 utils = __import__('227_utils')
 
-LEARNING_RATE = 0.00000005
+LEARNING_RATE = 0.0000005
 BATCH_SIZE = 20
-EPOCHS = 30
+EPOCHS = 50
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
 ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
