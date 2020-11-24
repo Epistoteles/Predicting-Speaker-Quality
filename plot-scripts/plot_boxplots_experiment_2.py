@@ -2,13 +2,17 @@ import matplotlib.pyplot as plt
 from statistics import median
 
 # define and set title
-title = 'Pairwise prediction accuracy for 10-fold cross-validation'
+title = 'Discrete prediction accuracy for 10-fold cross-validation'
 plt.title(title)
 
 # define data
-data1 = [30, 45, 46, 35, 59, 67, 23, 75, 45, 65]
-data2 = [70, 77, 84, 34, 56, 75, 80, 48, 55, 54]
-data3 = [30, 40, 50, 70, 77, 82, 55, 65, 45, 50]
+# audio features
+data1 = []
+# GE2E embeddings
+data2 = [0.1211964413523674, 0.23287878930568695, 0.31405943632125854, 0.3469264805316925, 0.29702845215797424,
+         0.18917779624462128, 0.27789291739463806, 0.3133980333805084, 0.14922665059566498, 0.20600064098834991]
+# TRILL embeddings
+data3 = []
 data = [data1, data2, data3]
 
 # plot data
@@ -17,7 +21,7 @@ boxplot = plt.boxplot(data,
                       medianprops=dict(color='black'))
 
 # define and set ticks
-ticks = ['Audio Features', 'GE2E', 'TRILL']
+ticks = ['Audio Features', 'GE2E Embeddings', 'TRILL Embeddings']
 plt.xticks([1, 2, 3], labels=ticks)
 
 # define and set axis labels

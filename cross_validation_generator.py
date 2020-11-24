@@ -2,6 +2,8 @@ import collections
 import os
 import pickle
 import numpy as np
+import pandas as pd
+import tensorflow as tf
 from statistics import mean, stdev
 
 from data_objects.Sample import Sample
@@ -14,9 +16,37 @@ np.set_printoptions(precision=3)
 MAX_PER_SPEAKER = 100
 
 
-def get_folds(embedding_type, dataset, timeseries=False, folds=10, seed=None):
+def load_feature_stream(dataset, path):
     """
-    Takes in the embedding type to use as well as the dataset to use
+    Takes in a dataset directory and a Sample object and returns the
+    concatenated feature streams.
+    """
+    # load the files one by one
+    ffv = pd.read_csv(f'{path}.ffv', delimiter=' ', header=None)
+    hnr = pd.read_csv(f'{path}.hnr', delimiter=' ', header=None)
+    jitter = pd.read_csv(f'{path}.jitter', delimiter=' ', header=None)
+    lfbank = pd.read_csv(f'{path}.lfbank', delimiter=' ', header=None)
+    mfc = pd.read_csv(f'{path}.mfc', delimiter=',', header=None)
+    pitch_esps = pd.read_csv(f'{path}.pitch.esps', delimiter=' ', header=None)
+    shimmer = pd.read_csv(f'{path}.shimmer', delimiter=' ', header=None)
+
+    # concatenate values into one dataframe
+    feat_stream = pd.concat([ffv, hnr, jitter, lfbank, mfc, pitch_esps, shimmer], axis=1)
+
+    # the features have different lengths, so cut them off at the minimum length
+    # min_len = feat_stream.count().min()
+    feat_stream = feat_stream.head(990)  # 990 or min_len if wav not 10 sec long
+
+    # since the resolution is currenly 10 ms, we only take every 10th row, making it 100 ms
+    feat_stream = feat_stream.iloc[::10]
+
+    # return the values as numpy array in tf tensor
+    return tf.convert_to_tensor(feat_stream.to_numpy().astype(np.float32))
+
+
+def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
+    """
+    Takes in the feature type to use as well as the dataset to use
     and returns folds times a train set and val set with data and labels
     in the order x_train, y_train, x_val, y_val.
     """
@@ -40,23 +70,34 @@ def get_folds(embedding_type, dataset, timeseries=False, folds=10, seed=None):
                 for f in files:
                     if f.endswith('.wav'):
                         section = f.split('.wav')[0]
-                        if embedding_type == 'embeddings-ge2e':
-                            embedding = pickle.load(
-                                open(os.path.join(root.replace('wavs/', f'{embedding_type}/'), f'{section}.pickle'), 'rb'))
+                        if feature_type == 'embeddings-ge2e':
+                            feature = pickle.load(
+                                open(os.path.join(root.replace('wavs/', f'{feature_type}/'), f'{section}.pickle'),
+                                     'rb'))
                             samples.append(
-                                Sample(speaker, article, section, embedding=embedding, embedding_type=embedding_type))
-                        elif embedding_type == 'embeddings-trill':
-                            embedding = pickle.load(
-                                open(os.path.join(root.replace('wavs/', f'{embedding_type}/'), f'{section}.pickle'), 'rb'))
+                                Sample(speaker, article, section, feature=feature, feature_type=feature_type))
+                        elif feature_type == 'embeddings-trill':
+                            feature = pickle.load(
+                                open(os.path.join(root.replace('wavs/', f'{feature_type}/'), f'{section}.pickle'),
+                                     'rb'))
                             samples.append(
-                                Sample(speaker, article, section, embedding=embedding if timeseries else np.mean(embedding, axis=0), embedding_type=embedding_type))
-                        else:
-                            samples.append(Sample(speaker, article, section))
+                                Sample(speaker, article, section,
+                                       feature=feature if timeseries else np.mean(feature, axis=0),
+                                       feature_type=feature_type))
+                        elif feature_type == 'feature-streams':
+                            feat_stream = load_feature_stream(dataset,
+                                                              os.path.join(root.replace('wavs/', f'{feature_type}/'),
+                                                                           f'{section}'))
+                            samples.append(
+                                Sample(speaker, article, section,
+                                       feature=feat_stream if timeseries else np.mean(feat_stream, axis=0),
+                                       feature_type=feature_type))
 
     # sort the used/appearing speakers by quality
     speakers_ordered_by_quality = sorted(speaker_to_quality_dict, key=speaker_to_quality_dict.get)
     print(f'number of speakers: {len(speakers_ordered_by_quality)}')
-    print(f'number of speakers (without quality -1/unknown): {len(list(filter(lambda x: speaker_to_quality_dict[x] >= 0, speakers_ordered_by_quality)))}')
+    print(
+        f'number of speakers (without quality -1/unknown): {len(list(filter(lambda x: speaker_to_quality_dict[x] >= 0, speakers_ordered_by_quality)))}')
     print(f'amount of samples: {len(samples)}')
     print(f'unique qualities: {len(set(map(lambda x: x.speaker.quality, samples)))}')
     print(f'unique speaker names: {len(set(map(lambda x: x.speaker.name, samples)))}')
@@ -109,7 +150,7 @@ def get_folds(embedding_type, dataset, timeseries=False, folds=10, seed=None):
             for i in range(min(len(speaker_samples), MAX_PER_SPEAKER)):
                 np.random.shuffle(speaker_samples)
                 selected_sample = speaker_samples.pop()
-                x_train += [selected_sample.embedding]
+                x_train += [selected_sample.feature]
                 y_train += [selected_sample.speaker.quality]
 
         # fill val list with up to MAX_PER_SPEAKER random samples from each speaker
@@ -118,8 +159,10 @@ def get_folds(embedding_type, dataset, timeseries=False, folds=10, seed=None):
             for i in range(min(len(speaker_samples), MAX_PER_SPEAKER)):
                 np.random.shuffle(speaker_samples)
                 selected_sample = speaker_samples.pop()
-                x_val += [selected_sample.embedding]
+                x_val += [selected_sample.feature]
                 y_val += [selected_sample.speaker.quality]
+
+        print('Filled all sets x_train, y_train, x_val, y_val')
 
         # yield new sets for each next(generator) call
         yield x_train, y_train, x_val, y_val
@@ -204,7 +247,6 @@ def generator_test(seed):
     print('++++++++++++++++++')
 
     return size_val_stdev
-
 
 # print(generator_test(21))
 

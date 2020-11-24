@@ -11,7 +11,7 @@ from statistics import mean
 from human_id import generate_id
 import os
 
-# os.environ['WANDB_MODE'] = 'dryrun'
+os.environ['WANDB_MODE'] = 'dryrun'
 
 from cross_validation_generator import get_folds
 
@@ -26,10 +26,10 @@ DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 LOSS = "mean_squared_error"
 USE_LSTM = True
-EMBEDDING_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill (embeddings dir name)
-TRAINING_DATA = "split-10"  # split-10, ... (subdir name in ./wavs)
+FEATURE_TYPE = "feature-streams"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
+FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
-generator = get_folds(EMBEDDING_TYPE, TRAINING_DATA, USE_LSTM, CROSS_VAL, seed=21)
+generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=21)
 run_name = generate_id(word_count=3)
 
 print(f"Starting run {run_name} ...")
@@ -46,8 +46,8 @@ for i in range(1, CROSS_VAL + 1):
                 "dropout_rate": DROPOUT_RATE,
                 "cross_validation": CROSS_VAL,
                 "loss": LOSS,
-                "embedding_type": EMBEDDING_TYPE,
-                "training_data": TRAINING_DATA},
+                "feature_type": FEATURE_TYPE,
+                "feature_dir": FEATURE_DIR},
         project="SQE-quality",
         reinit=True,
         name=f"{run_name}-{i}/{CROSS_VAL}"
@@ -55,10 +55,12 @@ for i in range(1, CROSS_VAL + 1):
 
     print('--------------------------------')
     print(f"Starting cross validation {i}/{CROSS_VAL}")
-    print('--------------------------------')
+    print('--------------------------------\n')
 
     with run:
         x_train, y_train, x_val, y_val = next(generator)
+
+        print(f'Created folds for iteration {i}')
 
         x_train = np.array(x_train)
         x_val = np.array(x_val)
@@ -68,18 +70,18 @@ for i in range(1, CROSS_VAL + 1):
         x_train, y_train = shuffle(x_train, y_train)
 
         model = Sequential()
-        if EMBEDDING_TYPE == 'embeddings-ge2e':
+        if FEATURE_TYPE == 'embeddings-ge2e':
             model.add(Dense(256, input_dim=256))
             model.add(Activation(ACTIVATION_FUNC))
             model.add(Dropout(DROPOUT_RATE))
-        else:
+        elif FEATURE_TYPE == 'embeddings-trill':
             if USE_LSTM:
-                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048)), merge_mode='concat'))
-                model.add(Activation(ACTIVATION_FUNC))
-                model.add(Dropout(DROPOUT_RATE))
-                model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
+                model.add(Bidirectional(LSTM(2048, input_shape=(None, 2048)), merge_mode='concat'))  # None was 54 before
             else:
                 model.add(Dense(2048, input_dim=2048))
+            model.add(Activation(ACTIVATION_FUNC))
+            model.add(Dropout(DROPOUT_RATE))
+            model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
             model.add(Activation(ACTIVATION_FUNC))
             model.add(Dropout(DROPOUT_RATE))
             model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
@@ -91,7 +93,9 @@ for i in range(1, CROSS_VAL + 1):
             model.add(Dense(512, kernel_constraint=MaxNorm(3)))
             model.add(Activation(ACTIVATION_FUNC))
             model.add(Dropout(DROPOUT_RATE))
-        model.add(Dense(256, kernel_constraint=MaxNorm(3)))
+            model.add(Dense(256, kernel_constraint=MaxNorm(3)))
+        elif FEATURE_TYPE == 'feature-streams':
+            model.add(Bidirectional(LSTM(256, input_shape=(99, 50)), merge_mode='concat'))
         model.add(Activation(ACTIVATION_FUNC))
         model.add(Dropout(DROPOUT_RATE))
         model.add(Dense(256, kernel_constraint=MaxNorm(3)))
@@ -119,9 +123,12 @@ for i in range(1, CROSS_VAL + 1):
 
         model.compile(loss=LOSS, optimizer=switcher.get(OPTIMIZER))
 
-        # model.build((None, 2048, 54))
-        # model.summary()
+        print('Compiled model - starting training ...')
 
+        # model.build((None, 2048, 54))  # TRILL
+        # model.build((None, 50, None))  # audio feature streams
+        # model.summary()
+        #
         # exit()
 
         history = model.fit(
