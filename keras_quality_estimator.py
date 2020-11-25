@@ -26,7 +26,7 @@ DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 LOSS = "mean_squared_error"
 USE_LSTM = False
-FEATURE_TYPE = "embeddings-ge2e"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
+FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
 generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=21)
@@ -76,7 +76,7 @@ for i in range(1, CROSS_VAL + 1):
             model.add(Dropout(DROPOUT_RATE))
         elif FEATURE_TYPE == 'embeddings-trill':
             if USE_LSTM:
-                model.add(Bidirectional(LSTM(2048, input_shape=(None, 2048)), merge_mode='concat'))  # None was 54 before
+                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048)), merge_mode='concat'))  # None was 54 before
             else:
                 model.add(Dense(2048, input_dim=2048))
             model.add(Activation(ACTIVATION_FUNC))
