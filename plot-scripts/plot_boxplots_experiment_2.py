@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from statistics import median
 
 # define and set title
-title = 'Discrete prediction accuracy for 10-fold cross-validation'
+title = 'Discrete prediction MSE for 10-fold cross-validation'
 plt.title(title)
 
 # define data
@@ -16,7 +16,9 @@ data2 = [0.049740981310606, 0.09591852873563766, 0.06659960746765137, 0.05881047
 data3 = [0.1782779097557068, 0.09736426919698715, 0.07286163419485092, 0.07695775479078293, 0.08534342795610428,
          0.07305404543876648, 0.07507871091365814, 0.1156117394566536, 0.07184602320194244, 0.06726393848657608]
 # TRILL embeddings LSTM
-data4 = []
+data4 = [0.15139083564281464, 0.24335020780563354, 0.10845743119716644, 0.19537560641765594, 0.10896427184343338,
+         0.12210535258054733, 0.09788074344396591, 0.26935020089149475, 0.0851287767291069, 0.12047532945871353]
+
 data = [data1, data2, data3, data4]
 
 # plot data
@@ -25,15 +27,15 @@ boxplot = plt.boxplot(data,
                       medianprops=dict(color='black'))
 
 # define and set ticks
-ticks = ['Audio Features', 'GE2E Embeddings', 'TRILL Embeddings']
-plt.xticks([1, 2, 3], labels=ticks)
+ticks = ['Audio Features Bi-LSTM', 'GE2E Embeddings', 'TRILL Embeddings Avg.', 'TRILL Embeddings Bi-LSTM']
+plt.xticks([1, 2, 3, 4], labels=ticks)
 
 # define and set axis labels
 plt.xlabel('')
 plt.ylabel('accuracy')
 
 # define and set RGB colors
-colors = [(0.9, 0.5, 0.3), (0.3, 0.7, 0.9), (0.3, 0.9, 0.5)]
+colors = [(0.9, 0.5, 0.3), (0.3, 0.7, 0.9), (0.3, 0.9, 0.5), (0.25, 0.85, 0.45)]
 for i, box in enumerate(boxplot['boxes']):
     # change outline color
     box.set(color=colors[i], linewidth=1)
@@ -41,7 +43,8 @@ for i, box in enumerate(boxplot['boxes']):
     box.set(facecolor=colors[i])
 
 # draw baseline
-plt.axhline(y=median(data1), color=colors[0], linestyle='--')
+# plt.axhline(y=median(data1), color=colors[0], linestyle='--')
+plt.axhline(y=0.1, color=colors[0], linestyle='--')
 
 # make y axis start at 0
 plt.ylim(ymin=0)

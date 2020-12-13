@@ -37,8 +37,8 @@ def load_feature_stream(dataset, path):
     # min_len = feat_stream.count().min()
     feat_stream = feat_stream.head(990)  # 990 or min_len if wav not 10 sec long
 
-    # since the resolution is currenly 10 ms, we only take every 10th row, making it 100 ms
-    feat_stream = feat_stream.iloc[::10]
+    # since the resolution is currenly 10 ms, we take the average of 20 rows repeatedly, making it 200 ms
+    feat_stream = feat_stream.groupby(np.arange(len(feat_stream)) // 20).mean()
 
     # return the values as numpy array in tf tensor
     return tf.convert_to_tensor(feat_stream.to_numpy().astype(np.float32))

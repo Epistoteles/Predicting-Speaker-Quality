@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Dense, Activation, Dropout, Bidirectional, L
 from tensorflow.keras.optimizers import SGD, Adam, Adamax, Adagrad, Nadam
 from tensorflow.keras.constraints import MaxNorm
 from tensorflow.keras.callbacks import EarlyStopping, History
+from keras_self_attention import SeqSelfAttention
 import wandb
 from wandb.keras import WandbCallback
 from sklearn.utils import shuffle
@@ -17,7 +18,7 @@ from cross_validation_generator import get_folds
 
 utils = __import__('227_utils')
 
-LEARNING_RATE = 0.0000005
+LEARNING_RATE = 0.0000005  # 0.0000005
 BATCH_SIZE = 20
 EPOCHS = 50
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
@@ -26,7 +27,7 @@ DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 LOSS = "mean_squared_error"
 USE_LSTM = True
-FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
+FEATURE_TYPE = "feature-streams"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
 generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=21)
@@ -76,7 +77,7 @@ for i in range(1, CROSS_VAL + 1):
             model.add(Dropout(DROPOUT_RATE))
         elif FEATURE_TYPE == 'embeddings-trill':
             if USE_LSTM:
-                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048)), merge_mode='concat'))  # None was 54 before
+                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048)), merge_mode='concat'))
             else:
                 model.add(Dense(2048, input_dim=2048))
             model.add(Activation(ACTIVATION_FUNC))
@@ -95,7 +96,8 @@ for i in range(1, CROSS_VAL + 1):
             model.add(Dropout(DROPOUT_RATE))
             model.add(Dense(256, kernel_constraint=MaxNorm(3)))
         elif FEATURE_TYPE == 'feature-streams':
-            model.add(Bidirectional(LSTM(256, input_shape=(99, 50)), merge_mode='concat'))
+            model.add(Bidirectional(LSTM(256, input_shape=(50, 50)), merge_mode='concat', return_sequences=True))  # first 50 is timesteps, second 50 is length of features
+            model.add(SeqSelfAttention(attention_width=15, attention_activation=ACTIVATION_FUNC))  # attention width 15 * 200 ms = 3 seconds
         model.add(Activation(ACTIVATION_FUNC))
         model.add(Dropout(DROPOUT_RATE))
         model.add(Dense(256, kernel_constraint=MaxNorm(3)))
@@ -140,7 +142,7 @@ for i in range(1, CROSS_VAL + 1):
             validation_data=(x_val, y_val),
             callbacks=[WandbCallback(),
                        EarlyStopping(
-                           monitor='val_loss', min_delta=0, patience=2, verbose=0, mode='auto',
+                           monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
                            baseline=None, restore_best_weights=True
                        )]
         )
