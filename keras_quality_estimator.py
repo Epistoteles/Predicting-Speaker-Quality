@@ -96,7 +96,7 @@ for i in range(1, CROSS_VAL + 1):
             model.add(Dropout(DROPOUT_RATE))
             model.add(Dense(256, kernel_constraint=MaxNorm(3)))
         elif FEATURE_TYPE == 'feature-streams':
-            model.add(Bidirectional(LSTM(256, input_shape=(50, 50)), merge_mode='concat', return_sequences=True))  # first 50 is timesteps, second 50 is length of features
+            model.add(Bidirectional(LSTM(256, input_shape=(50, 50), return_sequences=True), merge_mode='concat'))  # first 50 is timesteps, second 50 is length of features
             model.add(SeqSelfAttention(attention_width=15, attention_activation=ACTIVATION_FUNC))  # attention width 15 * 200 ms = 3 seconds
         model.add(Activation(ACTIVATION_FUNC))
         model.add(Dropout(DROPOUT_RATE))
