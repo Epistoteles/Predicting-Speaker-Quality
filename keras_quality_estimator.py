@@ -18,7 +18,7 @@ from cross_validation_generator import get_folds
 
 utils = __import__('227_utils')
 
-LEARNING_RATE = 5e-08  # 5e-08
+LEARNING_RATE = 5e-07  # 5e-08, 5e-07
 BATCH_SIZE = 20
 EPOCHS = 50
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
