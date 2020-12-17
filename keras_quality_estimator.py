@@ -155,7 +155,7 @@ for i in range(1, CROSS_VAL + 1):
         print(best_loss_per_fold)
         print(f'Average best loss:{mean(best_loss_per_fold)}')
 
-        if i == CROSS_VAL:
-            run.log({"avg_best_loss": mean(best_loss_per_fold)})
+        # if i == CROSS_VAL:
+        #     run.log({"avg_best_loss": mean(best_loss_per_fold)})
 
         # model.evaluate(x_val, y_val)
