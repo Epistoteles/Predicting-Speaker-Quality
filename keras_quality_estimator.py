@@ -58,104 +58,104 @@ for i in range(1, CROSS_VAL + 1):
     print(f"Starting cross validation {i}/{CROSS_VAL}")
     print('--------------------------------\n')
 
-    with run:
-        x_train, y_train, x_val, y_val = next(generator)
+    # with run:
+    x_train, y_train, x_val, y_val = next(generator)
 
-        print(f'Created folds for iteration {i}')
+    print(f'Created folds for iteration {i}')
 
-        x_train = np.array(x_train)
-        x_val = np.array(x_val)
-        y_train = np.array(y_train)
-        y_val = np.array(y_val)
+    x_train = np.array(x_train)
+    x_val = np.array(x_val)
+    y_train = np.array(y_train)
+    y_val = np.array(y_val)
 
-        x_train, y_train = shuffle(x_train, y_train)
+    x_train, y_train = shuffle(x_train, y_train)
 
-        model = Sequential()
-        if FEATURE_TYPE == 'embeddings-ge2e':
-            model.add(Dense(256, input_dim=256))
-            model.add(Activation(ACTIVATION_FUNC))
-            model.add(Dropout(DROPOUT_RATE))
-        elif FEATURE_TYPE == 'embeddings-trill':
-            if USE_LSTM:
-                model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048), return_sequences=True), merge_mode='concat'))  # 54 timesteps, 2048 feature length per timestep
-                model.add(SeqSelfAttention(attention_width=15,
-                                           attention_activation=ACTIVATION_FUNC))  # attention width 15 * 200 ms = 3 seconds
-            else:
-                model.add(Dense(2048, input_dim=2048))
-            model.add(Activation(ACTIVATION_FUNC))
-            model.add(Dropout(DROPOUT_RATE))
-            model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
-            model.add(Activation(ACTIVATION_FUNC))
-            model.add(Dropout(DROPOUT_RATE))
-            model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
-            model.add(Activation(ACTIVATION_FUNC))
-            model.add(Dropout(DROPOUT_RATE))
-            model.add(Dense(1024, kernel_constraint=MaxNorm(3)))
-            model.add(Activation(ACTIVATION_FUNC))
-            model.add(Dropout(DROPOUT_RATE))
-            model.add(Dense(512, kernel_constraint=MaxNorm(3)))
-            model.add(Activation(ACTIVATION_FUNC))
-            model.add(Dropout(DROPOUT_RATE))
-            model.add(Dense(256, kernel_constraint=MaxNorm(3)))
-        elif FEATURE_TYPE == 'feature-streams':
-            model.add(Bidirectional(LSTM(256, input_shape=(50, 50), return_sequences=True), merge_mode='concat'))  # first 50 is timesteps, second 50 is length of features
+    model = Sequential()
+    if FEATURE_TYPE == 'embeddings-ge2e':
+        model.add(Dense(256, input_dim=256))
+        model.add(Activation(ACTIVATION_FUNC))
+        model.add(Dropout(DROPOUT_RATE))
+    elif FEATURE_TYPE == 'embeddings-trill':
+        if USE_LSTM:
+            model.add(Bidirectional(LSTM(2048, input_shape=(54, 2048), return_sequences=True), merge_mode='concat'))  # 54 timesteps, 2048 feature length per timestep
             model.add(SeqSelfAttention(attention_width=15,
                                        attention_activation=ACTIVATION_FUNC))  # attention width 15 * 200 ms = 3 seconds
+        else:
+            model.add(Dense(2048, input_dim=2048))
+        model.add(Activation(ACTIVATION_FUNC))
+        model.add(Dropout(DROPOUT_RATE))
+        model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
+        model.add(Activation(ACTIVATION_FUNC))
+        model.add(Dropout(DROPOUT_RATE))
+        model.add(Dense(2048, kernel_constraint=MaxNorm(3)))
+        model.add(Activation(ACTIVATION_FUNC))
+        model.add(Dropout(DROPOUT_RATE))
+        model.add(Dense(1024, kernel_constraint=MaxNorm(3)))
+        model.add(Activation(ACTIVATION_FUNC))
+        model.add(Dropout(DROPOUT_RATE))
+        model.add(Dense(512, kernel_constraint=MaxNorm(3)))
         model.add(Activation(ACTIVATION_FUNC))
         model.add(Dropout(DROPOUT_RATE))
         model.add(Dense(256, kernel_constraint=MaxNorm(3)))
-        model.add(Activation(ACTIVATION_FUNC))
-        model.add(Dropout(DROPOUT_RATE))
-        model.add(Dense(256, kernel_constraint=MaxNorm(3)))
-        model.add(Activation(ACTIVATION_FUNC))
-        model.add(Dropout(DROPOUT_RATE))
-        model.add(Dense(128, kernel_constraint=MaxNorm(3)))
-        model.add(Activation(ACTIVATION_FUNC))
-        model.add(Dense(64, kernel_constraint=MaxNorm(3)))
-        model.add(Activation(ACTIVATION_FUNC))
-        model.add(Dense(32))
-        model.add(Activation(ACTIVATION_FUNC))
-        model.add(Dense(1))
-        model.add(Activation(ACTIVATION_FUNC))
+    elif FEATURE_TYPE == 'feature-streams':
+        model.add(Bidirectional(LSTM(256, input_shape=(50, 50), return_sequences=True), merge_mode='concat'))  # first 50 is timesteps, second 50 is length of features
+        model.add(SeqSelfAttention(attention_width=15,
+                                   attention_activation=ACTIVATION_FUNC))  # attention width 15 * 200 ms = 3 seconds
+    model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dropout(DROPOUT_RATE))
+    model.add(Dense(256, kernel_constraint=MaxNorm(3)))
+    model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dropout(DROPOUT_RATE))
+    model.add(Dense(256, kernel_constraint=MaxNorm(3)))
+    model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dropout(DROPOUT_RATE))
+    model.add(Dense(128, kernel_constraint=MaxNorm(3)))
+    model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dense(64, kernel_constraint=MaxNorm(3)))
+    model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dense(32))
+    model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dense(1))
+    model.add(Activation(ACTIVATION_FUNC))
 
-        switcher = {
-            "sgd": SGD(learning_rate=LEARNING_RATE),
-            "adam": Adam(learning_rate=LEARNING_RATE),
-            "adamax": Adamax(learning_rate=LEARNING_RATE),
-            "adagrad": Adagrad(learning_rate=LEARNING_RATE),
-            "nadam": Nadam(learning_rate=LEARNING_RATE)
-        }
+    switcher = {
+        "sgd": SGD(learning_rate=LEARNING_RATE),
+        "adam": Adam(learning_rate=LEARNING_RATE),
+        "adamax": Adamax(learning_rate=LEARNING_RATE),
+        "adagrad": Adagrad(learning_rate=LEARNING_RATE),
+        "nadam": Nadam(learning_rate=LEARNING_RATE)
+    }
 
-        model.compile(loss=LOSS, optimizer=switcher.get(OPTIMIZER))
+    model.compile(loss=LOSS, optimizer=switcher.get(OPTIMIZER))
 
-        print('Compiled model - starting training ...')
+    print('Compiled model - starting training ...')
 
-        # model.build((None, 2048, 54))  # TRILL
-        # model.build((None, 50, None))  # audio feature streams
-        # model.summary()
-        #
-        # exit()
+    # model.build((None, 2048, 54))  # TRILL
+    # model.build((None, 50, None))  # audio feature streams
+    # model.summary()
+    #
+    # exit()
 
-        history = model.fit(
-            x_train,
-            y_train,
-            # validation_split=VAL_SPLIT,
-            batch_size=BATCH_SIZE,
-            epochs=EPOCHS,
-            validation_data=(x_val, y_val),
-            callbacks=[# WandbCallback(),
-                       EarlyStopping(
-                           monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
-                           baseline=None, restore_best_weights=True
-                       )]
-        )
+    history = model.fit(
+        x_train,
+        y_train,
+        # validation_split=VAL_SPLIT,
+        batch_size=BATCH_SIZE,
+        epochs=EPOCHS,
+        validation_data=(x_val, y_val),
+        callbacks=[# WandbCallback(),
+                   EarlyStopping(
+                       monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
+                       baseline=None, restore_best_weights=True
+                   )]
+    )
 
-        print(f'History: {history.history}')
-        best_loss_per_fold += [min(history.history['val_loss'])]
-        print(best_loss_per_fold)
-        print(f'Average best loss:{mean(best_loss_per_fold)}')
+    print(f'History: {history.history}')
+    best_loss_per_fold += [min(history.history['val_loss'])]
+    print(best_loss_per_fold)
+    print(f'Average best loss:{mean(best_loss_per_fold)}')
 
-        # if i == CROSS_VAL:
-        #     run.log({"avg_best_loss": mean(best_loss_per_fold)})
+    # if i == CROSS_VAL:
+    #     run.log({"avg_best_loss": mean(best_loss_per_fold)})
 
-        # model.evaluate(x_val, y_val)
+    # model.evaluate(x_val, y_val)
