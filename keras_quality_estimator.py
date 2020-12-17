@@ -38,21 +38,21 @@ print(f"Starting run {run_name} ...")
 best_loss_per_fold = []
 
 for i in range(1, CROSS_VAL + 1):
-    run = wandb.init(
-        config={"learning_rate": LEARNING_RATE,
-                "batch size": BATCH_SIZE,
-                "epochs": EPOCHS,
-                "optimizer": OPTIMIZER,
-                "activation_func": ACTIVATION_FUNC,
-                "dropout_rate": DROPOUT_RATE,
-                "cross_validation": CROSS_VAL,
-                "loss": LOSS,
-                "feature_type": FEATURE_TYPE,
-                "feature_dir": FEATURE_DIR},
-        project="SQE-quality",
-        reinit=True,
-        name=f"{run_name}-{i}/{CROSS_VAL}"
-    )
+    # run = wandb.init(
+    #     config={"learning_rate": LEARNING_RATE,
+    #             "batch size": BATCH_SIZE,
+    #             "epochs": EPOCHS,
+    #             "optimizer": OPTIMIZER,
+    #             "activation_func": ACTIVATION_FUNC,
+    #             "dropout_rate": DROPOUT_RATE,
+    #             "cross_validation": CROSS_VAL,
+    #             "loss": LOSS,
+    #             "feature_type": FEATURE_TYPE,
+    #             "feature_dir": FEATURE_DIR},
+    #     project="SQE-quality",
+    #     reinit=True,
+    #     name=f"{run_name}-{i}/{CROSS_VAL}"
+    # )
 
     print('--------------------------------')
     print(f"Starting cross validation {i}/{CROSS_VAL}")
@@ -143,7 +143,7 @@ for i in range(1, CROSS_VAL + 1):
             batch_size=BATCH_SIZE,
             epochs=EPOCHS,
             validation_data=(x_val, y_val),
-            callbacks=[WandbCallback(),
+            callbacks=[# WandbCallback(),
                        EarlyStopping(
                            monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
                            baseline=None, restore_best_weights=True
