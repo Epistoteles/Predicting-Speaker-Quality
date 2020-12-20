@@ -187,6 +187,9 @@ def generator_test(seed):
     quality_stdev_per_speaker_val = []
     quality_stdev_per_embedding_train = []
     quality_stdev_per_embedding_val = []
+    min_val = []
+    max_val = []
+    max_diff = []
 
     # create generator and get all folds produced
     generator = get_folds('embeddings-ge2e', 'split-10', 10, seed=seed)
@@ -214,6 +217,9 @@ def generator_test(seed):
         quality_stdev_per_speaker_val += [stdev(set(n[3]))]
         quality_stdev_per_embedding_train += [stdev(n[1])]
         quality_stdev_per_embedding_val += [stdev(n[3])]
+        min_val += [min(n[3])]
+        max_val += [max(n[3])]
+        max_diff += [max_val[-1] - min_val[-1]]
 
     size_val_stdev = stdev(size_val)
 
@@ -244,11 +250,17 @@ def generator_test(seed):
     print(np.array(quality_stdev_per_embedding_train))
     print(np.array(quality_stdev_per_embedding_val))
     print(f'Standard deviation of val sizes: {size_val_stdev}')
+    print('min qualities in fold')
+    print(np.array(min_val))
+    print('max qualities in fold')
+    print(np.array(max_val))
+    print('max quality distance in fold')
+    print(np.array(max_diff))
     print('++++++++++++++++++')
 
     return size_val_stdev
 
-# print(generator_test(21))
+print(generator_test(21))
 
 # best_seed = 0
 # lowest_stdev = 100000
