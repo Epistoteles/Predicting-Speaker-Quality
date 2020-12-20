@@ -25,6 +25,7 @@ OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
 ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
 CROSS_VAL = 10
+ES_PATIENCE = 2
 LOSS = "mean_squared_error"
 USE_LSTM = False
 FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
@@ -145,7 +146,7 @@ for i in range(1, CROSS_VAL + 1):
         validation_data=(x_val, y_val),
         callbacks=[# WandbCallback(),
                    EarlyStopping(
-                       monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto',
+                       monitor='val_loss', min_delta=0, patience=ES_PATIENCE, verbose=0, mode='auto',
                        baseline=None, restore_best_weights=True
                    )]
     )
