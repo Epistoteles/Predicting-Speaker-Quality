@@ -18,11 +18,11 @@ from cross_validation_generator import get_folds
 
 utils = __import__('227_utils')
 
-LEARNING_RATE = 5e-07  # 5e-09, 5e-08, 5e-07
-BATCH_SIZE = 20
+LEARNING_RATE = 5e-08  # 5e-09, 5e-08, 5e-07
+BATCH_SIZE = 15
 EPOCHS = 50
-OPTIMIZER = "adam"  # sdg, adam, adamax, adagrad, nadam
-ACTIVATION_FUNC = "sigmoid"  # tanh, sigmoid
+OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
+ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 ES_PATIENCE = 2
