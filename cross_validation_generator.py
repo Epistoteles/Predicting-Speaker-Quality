@@ -256,6 +256,7 @@ def generator_test(seed):
     print(np.array(max_val))
     print('max quality distance in fold')
     print(np.array(max_diff))
+    print(f'average: {mean(max_diff)}')
     print('++++++++++++++++++')
 
     return size_val_stdev
