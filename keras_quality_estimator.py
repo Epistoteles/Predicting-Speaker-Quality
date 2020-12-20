@@ -18,7 +18,7 @@ from cross_validation_generator import get_folds
 
 utils = __import__('227_utils')
 
-LEARNING_RATE = 5e-09  # 5e-08, 5e-07
+LEARNING_RATE = 5e-08  # 5e-09, 5e-08, 5e-07
 BATCH_SIZE = 20
 EPOCHS = 50
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
@@ -26,7 +26,7 @@ ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 LOSS = "mean_squared_error"
-USE_LSTM = True
+USE_LSTM = False
 FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
