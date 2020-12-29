@@ -44,19 +44,15 @@ def load_feature_stream(dataset, path):
     return tf.convert_to_tensor(feat_stream.to_numpy().astype(np.float32))
 
 
-def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
+def load_samples(feature_type, dataset, timeseries):
     """
-    Takes in the feature type to use as well as the dataset to use
-    and returns folds times a train set and val set with data and labels
-    in the order x_train, y_train, x_val, y_val.
+    Takes in the feature_type and dataset directories and returns
+    a list of sample objects of the given feature for each wav file.
     """
-    # set seed if given
-    if seed is not None:
-        np.random.seed(seed)
-
     # get qualities for each speaker
     speaker_to_quality_dict = pickle.load(open('speaker_to_quality_dict.pickle', 'rb'))
 
+    # create empty sample list
     samples = []
 
     # fill in Sample objects into lists
@@ -92,6 +88,25 @@ def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
                                 Sample(speaker, article, section,
                                        feature=feat_stream if timeseries else np.mean(feat_stream, axis=0),
                                        feature_type=feature_type))
+
+    return samples
+
+
+def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
+    """
+    Takes in the feature type to use as well as the dataset to use
+    and returns folds times a train set and val set with data and labels
+    in the order x_train, y_train, x_val, y_val.
+    """
+    # set seed if given
+    if seed is not None:
+        np.random.seed(seed)
+
+    # get qualities for each speaker
+    speaker_to_quality_dict = pickle.load(open('speaker_to_quality_dict.pickle', 'rb'))
+
+    # load samples
+    samples = load_samples(feature_type, dataset, timeseries)
 
     # sort the used/appearing speakers by quality
     speakers_ordered_by_quality = sorted(speaker_to_quality_dict, key=speaker_to_quality_dict.get)
@@ -261,7 +276,7 @@ def generator_test(seed):
 
     return size_val_stdev
 
-print(generator_test(21))
+# print(generator_test(21))
 
 # best_seed = 0
 # lowest_stdev = 100000

@@ -156,6 +156,10 @@ for i in range(1, CROSS_VAL + 1):
     print(best_loss_per_fold)
     print(f'Average best loss:{mean(best_loss_per_fold)}')
 
+    generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=21)
+
+    model.save(f'{FEATURE_TYPE}-{mean(best_loss_per_fold)}-{run_name}')
+
     # if i == CROSS_VAL:
     #     run.log({"avg_best_loss": mean(best_loss_per_fold)})
 
