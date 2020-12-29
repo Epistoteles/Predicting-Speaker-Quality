@@ -18,7 +18,7 @@ from cross_validation_generator import get_folds
 
 utils = __import__('227_utils')
 
-LEARNING_RATE = 5e-08  # 5e-09, 5e-08, 5e-07
+LEARNING_RATE = 5e-07  # 5e-09, 5e-08, 5e-07
 BATCH_SIZE = 20
 EPOCHS = 50
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
@@ -158,7 +158,7 @@ for i in range(1, CROSS_VAL + 1):
 
     generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=21)
 
-    model.save(f'{FEATURE_TYPE}-{mean(best_loss_per_fold)}-{run_name}')
+    model.save(f'models/{FEATURE_TYPE}-{mean(best_loss_per_fold)}-{run_name}')
 
     # if i == CROSS_VAL:
     #     run.log({"avg_best_loss": mean(best_loss_per_fold)})
