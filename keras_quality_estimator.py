@@ -11,6 +11,7 @@ from sklearn.utils import shuffle
 from statistics import mean
 from human_id import generate_id
 import os
+import random
 
 # os.environ['WANDB_MODE'] = 'dryrun'
 
@@ -31,7 +32,10 @@ USE_LSTM = False
 FEATURE_TYPE = "embeddings-ge2e"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
-generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=21)
+seed = random.randint(0, 1000000)
+print(seed)
+
+generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=seed)  # seed=21
 run_name = generate_id(word_count=3)
 
 print(f"Starting run {run_name} ...")
