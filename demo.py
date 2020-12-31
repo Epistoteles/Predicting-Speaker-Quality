@@ -7,7 +7,6 @@ from matplotlib import pyplot as plt
 from statistics import mean
 
 
-
 def load_features(feature_type, timeseries=False, dataset='demo'):
     """
     Loads features of all wavs in the demo directory into a list and
@@ -51,7 +50,8 @@ def predict_speakers(feature_type, model=None, timeseries=False, dataset='demo')
     print(features[0])
     if model is None:
         models = os.listdir('models/')
-        models = sorted([m for m in models if m.startswith(f"{feature_type}-{'LSTM' if timeseries else '0'}")], key=lambda x: float(x.split('-')[2]))
+        models = sorted([m for m in models if m.startswith(f"{feature_type}-{'LSTM' if timeseries else '0'}")],
+                        key=lambda x: float(x.split('-')[2]))
         model = models[0]
     print(f"Loading model models/{model} ...")
     model = load_model(f'models/{model}')
@@ -72,7 +72,8 @@ def predict_speakers(feature_type, model=None, timeseries=False, dataset='demo')
 
 def plot_predictions_as_histogram(predictions, truths, feature_type, dataset):
     """
-    Takes in list of predictions and plots them as a histogram
+    Takes in list of predictions and plots them as a histogram. If valid truths
+    are supplied as well, they are added as second histogram for comparison.
     """
     bins = np.linspace(0, 1, 50)  # 50 bins from 0 to 1
     plt.xlim(0, 1)
@@ -80,10 +81,10 @@ def plot_predictions_as_histogram(predictions, truths, feature_type, dataset):
     if truths[0] >= 0:
         plt.hist(truths, bins=bins, alpha=0.5, label='Ground truth')
         plt.axvline(x=mean(truths), color='darkorange', linestyle='--')
-        plt.text(mean(truths)+0.01, 990, f'Ground truth mean: {mean(truths):.3f}', color='darkorange',
+        plt.text(mean(truths) + 0.01, 990, f'Ground truth mean: {mean(truths):.3f}', color='darkorange',
                  bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
     plt.axvline(x=mean(predictions), color='dodgerblue', linestyle='--')
-    plt.text(mean(predictions)+0.01, 920, f'Prediction mean: {mean(predictions):.3f}', color='dodgerblue',
+    plt.text(mean(predictions) + 0.01, 920, f'Prediction mean: {mean(predictions):.3f}', color='dodgerblue',
              bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
     plt.title(f'Predictions using {feature_type}')
     plt.xlabel('Predictions in 50 bins')
