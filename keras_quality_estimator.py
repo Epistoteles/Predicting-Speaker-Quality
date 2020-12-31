@@ -28,7 +28,7 @@ DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 ES_PATIENCE = 2
 LOSS = "mean_squared_error"
-USE_LSTM = False
+USE_LSTM = True
 FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
