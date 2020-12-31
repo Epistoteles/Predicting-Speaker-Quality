@@ -165,7 +165,7 @@ for i in range(1, CROSS_VAL + 1):
 
     prediction = model.predict(x_val)
     print(prediction)
-    predictions.concatenate(prediction)
+    predictions = np.append(predictions, prediction)
 
 model.save(f"models/{FEATURE_TYPE}{'-LSTM' if LSTM else ''}-{mean(best_loss_per_fold):.4f}-{run_name}")
 
