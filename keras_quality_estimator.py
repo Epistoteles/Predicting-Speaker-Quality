@@ -162,7 +162,7 @@ for i in range(1, CROSS_VAL + 1):
     print(best_loss_per_fold)
     print(f'Average best loss:{mean(best_loss_per_fold)}')
 
-model.save(f'models/{FEATURE_TYPE}-{mean(best_loss_per_fold):.4f}-{run_name}')
+model.save(f"models/{FEATURE_TYPE}{'-LSTM' if LSTM else ''}-{mean(best_loss_per_fold):.4f}-{run_name}")
 
     # if i == CROSS_VAL:
     #     run.log({"avg_best_loss": mean(best_loss_per_fold)})

@@ -51,7 +51,7 @@ def predict_speakers(feature_type, model=None, timeseries=False, dataset='demo')
     print(features[0])
     if model is None:
         models = os.listdir('models/')
-        models = sorted([m for m in models if m.startswith(feature_type)], key=lambda x: float(x.split('-')[2]))
+        models = sorted([m for m in models if m.startswith(f"{feature_type}-{'LSTM' if timeseries else '0'}")], key=lambda x: float(x.split('-')[2]))
         model = models[0]
     print(f"Loading model models/{model} ...")
     model = load_model(f'models/{model}')
