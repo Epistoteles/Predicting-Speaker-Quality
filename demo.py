@@ -1,6 +1,6 @@
 import os
 import pickle
-from cross_validation_generator import load_feature_stream, get_folds
+from cross_validation_generator import load_feature_stream, load_samples
 import numpy as np
 from tensorflow.keras.models import load_model
 from matplotlib import pyplot as plt
@@ -13,9 +13,11 @@ def load_features(feature_type, timeseries=False, dataset='demo'):
     returns it together with filenames and ground truths (if existent).
     """
     if dataset is 'split-10':
-        x_train, y_train, x_val, y_val = get_folds(feature_type, dataset, folds=1).__next__()
-        features = x_train + x_val
-        return features, len(features) * [''], y_train + y_val
+        samples = load_samples(feature_type, dataset, timeseries)
+        features = [s.feature for s in samples]
+        truths = [s.Speaker.quality for s in samples]
+        filenames = [f"{'/'.join(s.speaker, s.article, s.section)}.wav" for s in samples]
+        return features, filenames, truths
     features = []
     filenames = []
     for root, _, files in os.walk(os.path.join('wavs', dataset)):
@@ -81,10 +83,12 @@ def plot_predictions_as_histogram(predictions, truths, feature_type, dataset):
     if truths[0] >= 0:
         plt.hist(truths, bins=bins, alpha=0.5, label='Ground truth')
         plt.axvline(x=mean(truths), color='darkorange', linestyle='--')
-        plt.text(mean(truths) + 0.01, 990, f'Ground truth mean: {mean(truths):.3f}', color='darkorange',
+        plt.text(mean(truths) + 0.01, 0.93, f'Ground truth mean: {mean(truths):.3f}',
+                 transform=plt.gca().transAxes, color='darkorange',
                  bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
     plt.axvline(x=mean(predictions), color='dodgerblue', linestyle='--')
-    plt.text(mean(predictions) + 0.01, 920, f'Prediction mean: {mean(predictions):.3f}', color='dodgerblue',
+    plt.text(mean(predictions) + 0.01, 0.87, f'Prediction mean: {mean(predictions):.3f}',
+             transform=plt.gca().transAxes, color='dodgerblue',
              bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
     plt.title(f'Predictions using {feature_type}')
     plt.xlabel('Predictions in 50 bins')

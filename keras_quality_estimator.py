@@ -28,8 +28,8 @@ DROPOUT_RATE = 0.5
 CROSS_VAL = 10
 ES_PATIENCE = 2
 LOSS = "mean_squared_error"
-USE_LSTM = True
-FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
+USE_LSTM = False
+FEATURE_TYPE = "embeddings-ge2e"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
 seed = random.randint(0, 100000)
@@ -41,6 +41,7 @@ run_name = generate_id(word_count=3)
 print(f"Starting run {run_name} ...")
 
 best_loss_per_fold = []
+predictions = []
 
 for i in range(1, CROSS_VAL + 1):
     # run = wandb.init(
@@ -162,7 +163,12 @@ for i in range(1, CROSS_VAL + 1):
     print(best_loss_per_fold)
     print(f'Average best loss:{mean(best_loss_per_fold)}')
 
+    predictions += model.predict(x_val)
+
 model.save(f"models/{FEATURE_TYPE}{'-LSTM' if LSTM else ''}-{mean(best_loss_per_fold):.4f}-{run_name}")
+
+print(predictions)
+print(len(predictions))
 
     # if i == CROSS_VAL:
     #     run.log({"avg_best_loss": mean(best_loss_per_fold)})
