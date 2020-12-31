@@ -41,7 +41,7 @@ run_name = generate_id(word_count=3)
 print(f"Starting run {run_name} ...")
 
 best_loss_per_fold = []
-predictions = []
+predictions = np.array()
 
 for i in range(1, CROSS_VAL + 1):
     # run = wandb.init(
@@ -165,10 +165,11 @@ for i in range(1, CROSS_VAL + 1):
 
     prediction = model.predict(x_val)
     print(prediction)
-    predictions.append(prediction)
+    predictions.concatenate(prediction)
 
 model.save(f"models/{FEATURE_TYPE}{'-LSTM' if LSTM else ''}-{mean(best_loss_per_fold):.4f}-{run_name}")
 
+predictions = predictions.tolist()
 print(predictions)
 print(len(predictions))
 print(mean(predictions))
