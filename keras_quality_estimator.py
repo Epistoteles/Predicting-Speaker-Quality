@@ -32,8 +32,8 @@ USE_LSTM = False
 FEATURE_TYPE = "embeddings-ge2e"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
-seed = random.randint(0, 1000000)
-print(seed)
+seed = random.randint(0, 100000)
+print(f'Seed: {seed}')
 
 generator = get_folds(FEATURE_TYPE, FEATURE_DIR, USE_LSTM, CROSS_VAL, seed=seed)  # seed=21
 run_name = generate_id(word_count=3)
@@ -116,8 +116,10 @@ for i in range(1, CROSS_VAL + 1):
     model.add(Dropout(DROPOUT_RATE))
     model.add(Dense(128, kernel_constraint=MaxNorm(3)))
     model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dropout(DROPOUT_RATE))
     model.add(Dense(64, kernel_constraint=MaxNorm(3)))
     model.add(Activation(ACTIVATION_FUNC))
+    model.add(Dropout(DROPOUT_RATE))
     model.add(Dense(32))
     model.add(Activation(ACTIVATION_FUNC))
     model.add(Dense(1))

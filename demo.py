@@ -1,24 +1,22 @@
 import os
 import pickle
-from cross_validation_generator import load_feature_stream
+from cross_validation_generator import load_feature_stream, get_folds
 import numpy as np
-import numpy as np
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Activation, Dropout, Bidirectional, LSTM
-from tensorflow.keras.optimizers import SGD, Adam, Adamax, Adagrad, Nadam
-from tensorflow.keras.constraints import MaxNorm
-from tensorflow.keras.callbacks import EarlyStopping, History
-from keras_self_attention import SeqSelfAttention
-from sklearn.utils import shuffle
+from tensorflow.keras.models import load_model
+from matplotlib import pyplot as plt
 from statistics import mean
-from human_id import generate_id
 
 
-def load_demo_features(feature_type, timeseries=False, dataset='demo'):
+
+def load_features(feature_type, timeseries=False, dataset='demo'):
     """
-    Loads features of all wavs in the demo directory into a list
-    and returns it
+    Loads features of all wavs in the demo directory into a list and
+    returns it together with filenames and ground truths (if existent).
     """
+    if dataset is 'split-10':
+        x_train, y_train, x_val, y_val = get_folds(feature_type, dataset, folds=1).__next__()
+        features = x_train + x_val
+        return features, len(features) * [''], y_train + y_val
     features = []
     filenames = []
     for root, _, files in os.walk(os.path.join('wavs', dataset)):
@@ -41,19 +39,59 @@ def load_demo_features(feature_type, timeseries=False, dataset='demo'):
                                                                    f'{section}'))
                     features.append(feat_stream if timeseries else np.mean(feat_stream, axis=0))
             filenames.append(f)
-    return features, filenames
+    return features, filenames, len(features) * [-1]
 
 
-def predict_demo_speakers(model, feature_type, timeseries=False, dataset='demo'):
+def predict_speakers(feature_type, model=None, timeseries=False, dataset='demo'):
     """
     Print out predictions for wavs in demo directory using specific feature type
-    the best model for that feature type.
+    with the best model for that feature type.
     """
-    features, filenames = load_demo_features(feature_type, timeseries, dataset)
-    model = load_model(model)
+    features, filenames, truths = load_features(feature_type, timeseries, dataset)
+    print(features[0])
+    if model is None:
+        models = os.listdir('models/')
+        models = sorted([m for m in models if m.startswith(feature_type)], key=lambda x: float(x.split('-')[2]))
+        model = models[0]
+    print(f"Loading model models/{model} ...")
+    model = load_model(f'models/{model}')
+    model.summary()
+    predictions = []
     for feature, filename in zip(features, filenames):
-        prediction = model(feature, training=False)
-        print(f'Prediction for {filename}: {prediction} out of 1')
+        feature = feature.transpose()
+        # print(f'Feature: {feature}')
+        # print(feature.shape)
+        # print(f'Filename: {filename}')
+        prediction = model(np.array([feature, ]), training=False)
+        print(f'Prediction for {filename}: {prediction[0][0]:5f} out of 1')
+        predictions += prediction.numpy().tolist()[0]
+    print(predictions)
+    print(len(predictions))
+    plot_predictions_as_histogram(predictions, truths, feature_type, dataset)
 
 
-predict_demo_speakers('models/model', 'embeddings-ge2e')
+def plot_predictions_as_histogram(predictions, truths, feature_type, dataset):
+    """
+    Takes in list of predictions and plots them as a histogram
+    """
+    bins = np.linspace(0, 1, 50)  # 50 bins from 0 to 1
+    plt.xlim(0, 1)
+    plt.hist(predictions, bins=bins, alpha=0.5, label='Predictions')
+    if truths[0] >= 0:
+        plt.hist(truths, bins=bins, alpha=0.5, label='Ground truth')
+        plt.axvline(x=mean(truths), color='darkorange', linestyle='--')
+        plt.text(mean(truths)+0.01, 990, f'Ground truth mean: {mean(truths):.3f}', color='darkorange',
+                 bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
+    plt.axvline(x=mean(predictions), color='dodgerblue', linestyle='--')
+    plt.text(mean(predictions)+0.01, 920, f'Prediction mean: {mean(predictions):.3f}', color='dodgerblue',
+             bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
+    plt.title(f'Predictions using {feature_type}')
+    plt.xlabel('Predictions in 50 bins')
+    plt.ylabel('count')
+    plt.legend(loc='upper left')
+    if dataset == 'split-10':
+        plt.savefig(f'graphics/plots/prediction-vs-truth-{feature_type}.png')
+    plt.show()
+
+
+predict_speakers('embeddings-ge2e', dataset='split-10')
