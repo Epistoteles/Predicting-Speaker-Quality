@@ -3,8 +3,6 @@ import pickle
 from cross_validation_generator import load_feature_stream, load_samples
 import numpy as np
 from tensorflow.keras.models import load_model
-from matplotlib import pyplot as plt
-from statistics import mean
 
 
 def load_features(feature_type, timeseries=False, dataset='demo'):
@@ -69,34 +67,6 @@ def predict_speakers(feature_type, model=None, timeseries=False, dataset='demo')
         predictions += prediction.numpy().tolist()[0]
     print(predictions)
     print(len(predictions))
-    plot_predictions_as_histogram(predictions, truths, feature_type, dataset)
-
-
-def plot_predictions_as_histogram(predictions, truths, feature_type, dataset):
-    """
-    Takes in list of predictions and plots them as a histogram. If valid truths
-    are supplied as well, they are added as second histogram for comparison.
-    """
-    bins = np.linspace(0, 1, 50)  # 50 bins from 0 to 1
-    plt.xlim(0, 1)
-    plt.hist(predictions, bins=bins, alpha=0.5, label='Predictions')
-    if truths[0] >= 0:
-        plt.hist(truths, bins=bins, alpha=0.5, label='Ground truth')
-        plt.axvline(x=mean(truths), color='darkorange', linestyle='--')
-        plt.text(mean(truths) + 0.01, 0.93, f'Ground truth mean: {mean(truths):.3f}',
-                 transform=plt.gca().transAxes, color='darkorange',
-                 bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
-    plt.axvline(x=mean(predictions), color='dodgerblue', linestyle='--')
-    plt.text(mean(predictions) + 0.01, 0.87, f'Prediction mean: {mean(predictions):.3f}',
-             transform=plt.gca().transAxes, color='dodgerblue',
-             bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=1))
-    plt.title(f'Predictions using {feature_type}')
-    plt.xlabel('Predictions in 50 bins')
-    plt.ylabel('count')
-    plt.legend(loc='upper left')
-    if dataset == 'split-10':
-        plt.savefig(f'graphics/plots/prediction-vs-truth-{feature_type}.png')
-    plt.show()
 
 
 predict_speakers('embeddings-ge2e', dataset='split-10')
