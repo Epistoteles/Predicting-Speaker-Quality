@@ -29,3 +29,4 @@ embeddings-trill/*
 !embeddings-trill/README.md
 feature-streams/*
 !feature-streams/README.md
+/models/

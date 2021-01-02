@@ -1,6 +1,7 @@
 import csv
 import matplotlib.pyplot as plt
 from keras_rating_classifier import get_ranking_distance
+import seaborn as sns
 
 
 with open('../ratings.csv', newline='') as file:
@@ -10,6 +11,8 @@ with open('../ratings.csv', newline='') as file:
 data = list(map(lambda r: list(map(lambda i: int(i), r)), data))
 
 ranking_diffs = list(map(lambda x: get_ranking_distance(x), data))
+plt.figure(figsize=(10, 7))
+sns.set_style("darkgrid")
 plt.hist(ranking_diffs, bins=25)
 plt.title("Distances of ratings using active sampling", fontsize=15)
 plt.axvline(x=0.25, color="red")
