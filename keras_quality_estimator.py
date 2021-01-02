@@ -12,6 +12,7 @@ from statistics import mean
 from human_id import generate_id
 import os
 import random
+import pickle
 
 # os.environ['WANDB_MODE'] = 'dryrun'
 
@@ -19,9 +20,9 @@ from cross_validation_generator import get_folds
 
 utils = __import__('227_utils')
 
-LEARNING_RATE = 5e-07  # 5e-09, 5e-08, 5e-07
+LEARNING_RATE = 5e-08  # 5e-09, 5e-08, 5e-07
 BATCH_SIZE = 20
-EPOCHS = 50
+EPOCHS = 100
 OPTIMIZER = "adamax"  # sdg, adam, adamax, adagrad, nadam
 ACTIVATION_FUNC = "tanh"  # tanh, sigmoid
 DROPOUT_RATE = 0.5
@@ -41,6 +42,8 @@ run_name = generate_id(word_count=3)
 print(f"Starting run {run_name} ...")
 
 best_loss_per_fold = []
+predictions = []
+truths = []
 
 for i in range(1, CROSS_VAL + 1):
     # run = wandb.init(
@@ -162,9 +165,20 @@ for i in range(1, CROSS_VAL + 1):
     print(best_loss_per_fold)
     print(f'Average best loss:{mean(best_loss_per_fold)}')
 
-model.save(f"models/{FEATURE_TYPE}{'-LSTM' if LSTM else ''}-{mean(best_loss_per_fold):.4f}-{run_name}")
+    prediction = model.predict(x_val)
+    predictions += [prediction.flatten().tolist()]
+    truths += [y_val.flatten().tolist()]
 
     # if i == CROSS_VAL:
     #     run.log({"avg_best_loss": mean(best_loss_per_fold)})
 
     # model.evaluate(x_val, y_val)
+
+modelname = f"models/{FEATURE_TYPE}{'-LSTM' if USE_LSTM else ''}-{mean(best_loss_per_fold):.4f}-{run_name}"
+model.save(modelname)
+print(f'Saved last model as {modelname}')
+
+predictionsname = f"predictions/{FEATURE_TYPE}{'-LSTM' if USE_LSTM else ''}-{mean(best_loss_per_fold):.4f}-{run_name}.pickle"
+pickle.dump((predictions, truths), open(predictionsname, "wb"))
+print(f'Saved predictions as {predictionsname}')
+
