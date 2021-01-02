@@ -62,6 +62,8 @@ for i in range(1, CROSS_VAL + 1):
     #     name=f"{run_name}-{i}/{CROSS_VAL}"
     # )
 
+    os.system('krenew')
+
     print('--------------------------------')
     print(f"Starting cross validation {i}/{CROSS_VAL}")
     print('--------------------------------\n')
