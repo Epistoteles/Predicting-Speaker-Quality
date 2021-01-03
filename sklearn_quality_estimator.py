@@ -26,9 +26,9 @@ def predict(save_predictions=False, n_neighbors=300, max_depth=20):
     truths = []
 
     for i in range(1, CROSS_VAL + 1):
-        print('--------------------------------')
-        print(f"Starting cross validation {i}/{CROSS_VAL}")
-        print('--------------------------------\n')
+        print('-----------------------------------------------------')
+        print(f"Starting cross validation {i}/{CROSS_VAL} for param {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}")
+        print('-----------------------------------------------------\n')
 
         x_train, y_train, x_val, y_val = next(generator)
 
@@ -59,7 +59,7 @@ def predict(save_predictions=False, n_neighbors=300, max_depth=20):
         truths += [y_val.flatten().tolist()]
 
     avg_loss = mean(loss_per_fold)
-    print(f'\nMSE loss per fold: {loss_per_fold}')
+    print(f'MSE loss per fold: {loss_per_fold}')
     print(f"Average loss for {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}: {avg_loss}")
 
     if save_predictions:
@@ -75,7 +75,7 @@ def hyperparameter_search(start, end, stride):
     params = []
     loss_per_param = []
     for p in range(start, end+stride, stride):  # (10, 1010, 10) for k hyperparameter search from 10 to 1000 in steps of 10
-        print(f'Parameter: {p}/{end}')
+        print(f'\n\nParameter: {p}/{end}')
         avg_loss = predict(n_neighbors=p) if METHOD == 'KNN' else predict(max_depth=p)
         params += [p]
         loss_per_param += [avg_loss]
