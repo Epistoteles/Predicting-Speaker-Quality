@@ -26,9 +26,10 @@ def predict(save_predictions=False, n_neighbors=300, max_depth=20):
     truths = []
 
     for i in range(1, CROSS_VAL + 1):
-        print('-----------------------------------------------------')
-        print(f"Starting cross validation {i}/{CROSS_VAL} for param {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}")
-        print('-----------------------------------------------------\n')
+        start_message = f"Starting cross validation {i}/{CROSS_VAL} for param {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}"
+        print('-'*len(start_message))
+        print(start_message)
+        print('-'*len(start_message))
 
         x_train, y_train, x_val, y_val = next(generator)
 
@@ -59,8 +60,12 @@ def predict(save_predictions=False, n_neighbors=300, max_depth=20):
         truths += [y_val.flatten().tolist()]
 
     avg_loss = mean(loss_per_fold)
+    result = f"| Average loss for {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}: {avg_loss} |"
     print(f'MSE loss per fold: {loss_per_fold}')
-    print(f"Average loss for {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}: {avg_loss}")
+    print()
+    print('-'*len(result))
+    print(result)
+    print('-'*len(result))
 
     if save_predictions:
         predictionsname = f"predictions/{FEATURE_TYPE}-{METHOD}-{avg_loss:.4f}-{run_name}.pickle"
