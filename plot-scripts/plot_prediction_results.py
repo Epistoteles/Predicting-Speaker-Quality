@@ -63,7 +63,8 @@ def plot_predictions_as_scatterplot(predictions, truths, feature_type, timeserie
     """
     plt.figure(figsize=(10, 9))
     sns.set_style("darkgrid")
-    plt.xlim(0, 1)
+    plt.xlim(-0.02, 1.02)
+    plt.ylim(-0.02, 1.02)
     if len(predictions) == 10:
         for i in range(10):
             sns.scatterplot(truths[i], predictions[i], label=f"val set of fold {i + 1}/10")
@@ -81,7 +82,8 @@ def plot_desired_scatterplot(truths, feature_type):
     """
     plt.figure(figsize=(10, 9))
     sns.set_style("darkgrid")
-    plt.xlim(0, 1)
+    plt.xlim(-0.02, 1.02)
+    plt.ylim(-0.02, 1.02)
     if len(truths) == 10:
         for i in range(10):
             noisy_truth = list(map(lambda x: min(1, max(0, x * 0.8 + 0.1 +
@@ -102,6 +104,17 @@ def plot_predictions(feature_type, predictions=None, timeseries=False, knn=False
             key=lambda x: float(x.split('-')[3 if timeseries or knn else 2]))
         predictions = predictions[0]
     (predictions, truths) = pickle.load(open(f'../predictions/{predictions}', 'rb'))
+    # for some reason, predictions for timeseries are series
+    # I didn't have the time to fix this, so I take the mean of each predicted series
+    if timeseries:
+        new_predictions = []
+        for i in range(10):
+            compressed_predictions = []
+            factor = int(len(predictions[i]) / len(truths[i]))
+            for j in range(len(truths[i])):
+                compressed_predictions += [mean(predictions[i][j*factor:(j+1)*factor])]
+            new_predictions += [compressed_predictions]
+        predictions = new_predictions
     plot_predictions_as_histogram(predictions, truths, feature_type, dataset, timeseries, knn)
     plot_predictions_as_density(predictions, feature_type, timeseries, knn)
     plot_predictions_as_scatterplot(predictions, truths, feature_type, timeseries, knn)
@@ -110,6 +123,6 @@ def plot_predictions(feature_type, predictions=None, timeseries=False, knn=False
 
 plot_predictions('embeddings-trill')
 plot_predictions('embeddings-ge2e')
-# plot_predictions('feature-streams', timeseries=True)
+plot_predictions('feature-streams', timeseries=True)
 plot_predictions('embeddings-ge2e', knn=True)
 plot_predictions('embeddings-trill', knn=True)
