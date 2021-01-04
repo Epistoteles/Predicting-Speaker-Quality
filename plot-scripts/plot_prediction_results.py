@@ -120,13 +120,16 @@ def plot_predictions(feature_type, predictions=None, timeseries=False, knn=False
     plot_predictions_as_scatterplot(predictions, truths, feature_type, timeseries, knn)
     plot_desired_scatterplot(truths, feature_type)
 
+plot_predictions('feature-streams', timeseries=True)
+# plot_predictions('feature-streams')
+# plot_predictions('feature-streams', knn=True)
+# plot_predictions('feature-streams', rf=True)
 
 plot_predictions('embeddings-ge2e')
-plot_predictions('embeddings-trill')
-
-plot_predictions('feature-streams', timeseries=True)
-# plot_predictions('embeddings-ge2e', timeseries=True)
-plot_predictions('embeddings-trill', timeseries=True)
-
 plot_predictions('embeddings-ge2e', knn=True)
+# plot_predictions('embeddings-ge2e', rf=True)
+
+plot_predictions('embeddings-trill', timeseries=True)
+plot_predictions('embeddings-trill')
 plot_predictions('embeddings-trill', knn=True)
+# plot_predictions('embeddings-trill', rf=True)
