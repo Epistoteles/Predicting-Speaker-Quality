@@ -16,9 +16,9 @@ np.set_printoptions(precision=3)
 MAX_PER_SPEAKER = 100
 
 
-def load_feature_stream(dataset, path):
+def load_feature_stream(dataset, path, timeseries):
     """
-    Takes in a dataset directory and a Sample object and returns the
+    Takes in a dataset directory and the sample path and returns the
     concatenated feature streams.
     """
     # load the files one by one
@@ -38,10 +38,15 @@ def load_feature_stream(dataset, path):
     feat_stream = feat_stream.head(990)  # 990 or min_len if wav not 10 sec long
 
     # since the resolution is currenly 10 ms, we take the average of 20 rows repeatedly, making it 200 ms
-    feat_stream = feat_stream.groupby(np.arange(len(feat_stream)) // 20).mean()
+    if timeseries:
+        feat_stream = feat_stream.groupby(np.arange(len(feat_stream)) // 20).mean()
+        # return the values as numpy array in tf tensor
+        return tf.convert_to_tensor(feat_stream.to_numpy().astype(np.float32))
+    else:
+        feat_stream = np.mean(feat_stream, axis=0)
+        return feat_stream.to_numpy().astype(np.float32)
 
-    # return the values as numpy array in tf tensor
-    return tf.convert_to_tensor(feat_stream.to_numpy().astype(np.float32))
+
 
 
 def load_samples(feature_type, dataset, timeseries):
@@ -83,10 +88,10 @@ def load_samples(feature_type, dataset, timeseries):
                         elif feature_type == 'feature-streams':
                             feat_stream = load_feature_stream(dataset,
                                                               os.path.join(root.replace('wavs/', f'{feature_type}/'),
-                                                                           f'{section}'))
+                                                                           f'{section}'), timeseries=timeseries)
                             samples.append(
                                 Sample(speaker, article, section,
-                                       feature=feat_stream if timeseries else np.mean(feat_stream, axis=0),
+                                       feature=feat_stream,
                                        feature_type=feature_type))
 
     return samples

@@ -97,7 +97,7 @@ def plot_desired_scatterplot(truths, feature_type):
     plt.close()
 
 
-def plot_predictions(feature_type, predictions=None, timeseries=False, knn=False, dataset='split-10'):
+def plot_predictions(feature_type, predictions=None, timeseries=False, knn=False, rf=False, dataset='split-10'):
     if predictions is None:
         predictions = os.listdir('../predictions/')
         predictions = sorted([m for m in predictions if m.startswith(f"{feature_type}-{'LSTM' if timeseries else 'KNN' if knn else '0'}")],

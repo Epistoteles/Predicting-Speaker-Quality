@@ -9,24 +9,21 @@ import pickle
 from statistics import mean
 
 CROSS_VAL = 10
-LOSS = "mean_squared_error"
-FEATURE_TYPE = "embeddings-ge2e"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
+FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
-METHOD = 'RF'  # KNN, RF
 
-
-def predict(save_predictions=False, n_neighbors=300, max_depth=20):
+def predict(save_predictions=False, n_neighbors=310, max_depth=20, method='KNN'):
     generator = get_folds(FEATURE_TYPE, FEATURE_DIR, timeseries=False, folds=CROSS_VAL, seed=21)
     run_name = generate_id(word_count=3)
 
-    print(f"Starting run {run_name}-{METHOD} ...")
+    print(f"Starting run {run_name}-{method} ...")
 
     loss_per_fold = []
     predictions = []
     truths = []
 
     for i in range(1, CROSS_VAL + 1):
-        start_message = f"Starting cross validation {i}/{CROSS_VAL} for param {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}"
+        start_message = f"Starting cross validation {i}/{CROSS_VAL} for param {'k=' + str(n_neighbors) if method == 'KNN' else 'max_depth=' + str(max_depth)}"
         print('-'*len(start_message))
         print(start_message)
         print('-'*len(start_message))
@@ -42,11 +39,11 @@ def predict(save_predictions=False, n_neighbors=300, max_depth=20):
 
         x_train, y_train = shuffle(x_train, y_train)
 
-        if METHOD == 'KNN':
+        if method == 'KNN':
             knn = KNeighborsRegressor(n_neighbors=n_neighbors)
             knn.fit(x_train, y_train)
             prediction = knn.predict(x_val)
-        elif METHOD == 'RF':
+        elif method == 'RF':
             rf = RandomForestRegressor(max_depth=max_depth)
             rf.fit(x_train, y_train)
             prediction = rf.predict(x_val)
@@ -60,7 +57,7 @@ def predict(save_predictions=False, n_neighbors=300, max_depth=20):
         truths += [y_val.flatten().tolist()]
 
     avg_loss = mean(loss_per_fold)
-    result = f"| Average loss for {'k=' + str(n_neighbors) if METHOD == 'KNN' else 'max_depth=' + str(max_depth)}: {avg_loss} |"
+    result = f"| Average loss for {'k=' + str(n_neighbors) if method == 'KNN' else 'max_depth=' + str(max_depth)}: {avg_loss} |"
     print(f'MSE loss per fold: {loss_per_fold}')
     print()
     print('-'*len(result))
@@ -68,25 +65,36 @@ def predict(save_predictions=False, n_neighbors=300, max_depth=20):
     print('-'*len(result))
 
     if save_predictions:
-        predictionsname = f"predictions/{FEATURE_TYPE}-{METHOD}-{avg_loss:.4f}-{run_name}.pickle"
+        predictionsname = f"predictions/{FEATURE_TYPE}-{method}-{avg_loss:.4f}-{run_name}.pickle"
         pickle.dump((predictions, truths), open(predictionsname, "wb"))
         print(f'Saved predictions as {predictionsname}')
+
+        if method == 'KNN':
+            model = KNeighborsRegressor(n_neighbors=n_neighbors)
+        else:
+            model = RandomForestRegressor(max_depth=max_depth)
+        x_train, y_train, x_val, y_val = next(get_folds(FEATURE_TYPE, FEATURE_DIR, timeseries=False, folds=CROSS_VAL, seed=21))
+        model.fit(x_train+x_val, y_train+y_val)
+        modelname = f"models/{FEATURE_TYPE}-{method}-{avg_loss:.4f}-{run_name}.pickle"
+        pickle.dump(model, open(modelname, "wb"))
+        print(f'Saved model as {modelname}')
 
     return avg_loss
 
 
-def hyperparameter_search(start, end, stride):
-    print(f'Hyperparameter search for {METHOD} from {start} to {end} in steps of {stride}')
+def hyperparameter_search(start, end, stride, method):
+    print(f'Hyperparameter search for {method} from {start} to {end} in steps of {stride}')
     params = []
     loss_per_param = []
     for p in range(start, end+stride, stride):  # (10, 1010, 10) for k hyperparameter search from 10 to 1000 in steps of 10
         print(f'\n\nParameter: {p}/{end}')
-        avg_loss = predict(n_neighbors=p) if METHOD == 'KNN' else predict(max_depth=p)
+        avg_loss = predict(n_neighbors=p, method=method) if method == 'KNN' else predict(max_depth=p, method=method)
         params += [p]
         loss_per_param += [avg_loss]
     print(params)
     print(loss_per_param)
 
 # predict(max_depth=2)
+# predict(save_predictions=True, n_neighbors=310, method='KNN')
 
-hyperparameter_search(4, 120, 4)
+hyperparameter_search(1, 20, 1, 'RF')
