@@ -30,7 +30,17 @@ embeddings-trill/*
 feature-streams/*
 !feature-streams/README.md
 
+# ignore all trained models
+# models/*
+# !models/README.md
+
+# ignore all produced predictions
+# predictions/*
+# !predictions/README.md
+
 # ignore the following files
 test.py
-demo.py
 demo_knn.py
+server_predict.py
+server_update_embeddings.py
+keras_classifier.py

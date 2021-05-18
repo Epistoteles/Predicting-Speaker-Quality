@@ -32,3 +32,11 @@ To set up the project, follow these steps:
 ## (Re-)Creating Plots
 
 If you want to create plots from the resulting predictions (just like the ones seen in the thesis), take a look at the individual plotting scripts inside `plot-scripts`.
+
+## Demo
+
+In order to evaluate the audio recordings inside `wavs/demo`, please use the script `demo.py`.
+
+## Acknowledgements
+
+The code in the `encoder` directory, which generates the GE2E embeddings, is forked from Corentin Jemine (https://github.com/CorentinJ/Real-Time-Voice-Cloning) and available in a better documented format under the name `Resemblyzer`.
