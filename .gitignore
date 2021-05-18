@@ -9,9 +9,6 @@ __pycache__/
 # ignore wandb
 wandb/*
 
-# ignore local trill test
-/trill-test/
-
 # ignore the contents of the SW corpus, as it can be downloaded from somewhere else
 german/*
 !german/README.md
