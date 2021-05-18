@@ -20,7 +20,7 @@ german/*
 # anonymized and demo .wav files cannot be generated and have to be stored
 wavs/*
 !wavs/anonymized/
-!wavs/demo/
+!wavs/demo/README.md
 
 # ignore all features, as they can be created
 embeddings-ge2e/*
@@ -29,3 +29,8 @@ embeddings-trill/*
 !embeddings-trill/README.md
 feature-streams/*
 !feature-streams/README.md
+
+# ignore the following files
+test.py
+demo.py
+demo_knn.py
