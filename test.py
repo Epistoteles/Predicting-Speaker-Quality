@@ -9,7 +9,7 @@ import pickle
 from statistics import mean
 
 CROSS_VAL = 10
-FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
+FEATURE_TYPE = "feature-streams"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
 def predict(save_predictions=False, n_neighbors=310, max_depth=20, method='KNN'):
@@ -95,6 +95,6 @@ def hyperparameter_search(start, end, stride, method):
     print(loss_per_param)
 
 # predict(max_depth=2)
-predict(save_predictions=True, n_neighbors=480, method='KNN')
+# predict(save_predictions=True, max_depth=20, method='RF')
 
-# hyperparameter_search(1, 20, 1, 'RF')
+hyperparameter_search(1, 20, 1, 'RF')

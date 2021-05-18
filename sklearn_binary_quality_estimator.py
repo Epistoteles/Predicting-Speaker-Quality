@@ -14,7 +14,7 @@ FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 METHOD = 'KNN'  # KNN, RF
 
 
-def predict(save_predictions=False, n_neighbors=310, max_depth=20):
+def predict(save_predictions=False, n_neighbors=310, max_depth=20, remove_middle=False):
     generator = get_folds(FEATURE_TYPE, FEATURE_DIR, timeseries=False, folds=CROSS_VAL, seed=21)
     run_name = generate_id(word_count=3)
 
@@ -34,6 +34,34 @@ def predict(save_predictions=False, n_neighbors=310, max_depth=20):
 
         print(f'Created folds for iteration {i}')
 
+        if remove_middle:
+            print(len(x_train))
+            print(len(y_train))
+            print('removing middle values from train set')
+            x_train_new = []
+            y_train_new = []
+            for i in range(len(x_train)):
+                if y_train[i] <= 0.333 or y_train[i] >= 0.666:
+                    x_train_new += [x_train[i]]
+                    y_train_new += [y_train[i]]
+            print(len(x_train_new))
+            print(len(y_train_new))
+            print(len(x_val))
+            print(len(y_val))
+            print('removing middle values from val set')
+            x_val_new = []
+            y_val_new = []
+            for i in range(len(x_val)):
+                if y_val[i] <= 0.333 or y_val[i] >= 0.666:
+                    x_val_new += [x_val[i]]
+                    y_val_new += [y_val[i]]
+            print(len(x_val_new))
+            print(len(y_val_new))
+            x_train = x_train_new
+            x_val = x_val_new
+            y_train = y_train_new
+            y_val = y_val_new
+
         x_train = np.array(x_train)
         x_val = np.array(x_val)
         y_train = np.rint(y_train)
@@ -50,8 +78,8 @@ def predict(save_predictions=False, n_neighbors=310, max_depth=20):
             rf.fit(x_train, y_train)
             prediction = rf.predict(x_val)
 
-        # acc = accuracy_score(y_val, prediction)
-        acc = accuracy_score(y_val, np.random.randint(2, size=len(y_val)))  # replace predictions by random classes to simulate random guessing
+        acc = accuracy_score(y_val, prediction)
+        # acc = accuracy_score(y_val, np.random.randint(2, size=len(y_val)))  # replace predictions by random classes to simulate random guessing
 
         print(f'Accuracy for fold {i}: {acc}\n')
 
@@ -68,9 +96,58 @@ def predict(save_predictions=False, n_neighbors=310, max_depth=20):
     print('-'*len(result))
 
     if save_predictions:
-        predictionsname = f"predictions/{FEATURE_TYPE}-{METHOD}-{avg_loss:.4f}-{run_name}.pickle"
+        predictionsname = f"predictions/{FEATURE_TYPE}-CLASS-{avg_loss:.4f}-{run_name}.pickle"
         pickle.dump((predictions, truths), open(predictionsname, "wb"))
         print(f'Saved predictions as {predictionsname}')
+
+        model = KNeighborsClassifier(n_neighbors=n_neighbors)
+        x_train, y_train, x_val, y_val = next(
+            get_folds(FEATURE_TYPE, FEATURE_DIR, timeseries=False, folds=CROSS_VAL, seed=21))
+
+        if remove_middle:
+            print(len(x_train))
+            print(len(y_train))
+            print('removing middle values from train set')
+            x_train_new = []
+            y_train_new = []
+            for i in range(len(x_train)):
+                if y_train[i] <= 0.333 or y_train[i] >= 0.666:
+                    x_train_new += [x_train[i]]
+                    y_train_new += [y_train[i]]
+            print(len(x_train_new))
+            print(len(y_train_new))
+            print(len(x_val))
+            print(len(y_val))
+            print('removing middle values from val set')
+            x_val_new = []
+            y_val_new = []
+            for i in range(len(x_val)):
+                if y_val[i] <= 0.333 or y_val[i] >= 0.666:
+                    x_val_new += [x_val[i]]
+                    y_val_new += [y_val[i]]
+            print(len(x_val_new))
+            print(len(y_val_new))
+            x_train = x_train_new
+            x_val = x_val_new
+            y_train = y_train_new
+            y_val = y_val_new
+
+        x_train = np.array(x_train)
+        x_val = np.array(x_val)
+        y_train = np.rint(y_train)
+        y_val = np.rint(y_val)
+
+        print(len(x_train[0]))
+        print(len(x_val[0]))
+        print(y_train[0])
+        print(y_val[0])
+
+        x = np.concatenate((x_train, x_val))
+        y = np.concatenate((y_train, y_val))
+        model.fit(x, y)
+        modelname = f"models/{FEATURE_TYPE}-CLASS-{'NOMIDDLE' if remove_middle else 'FULL'}-{avg_loss:.4f}-{run_name}.pickle"
+        pickle.dump(model, open(modelname, "wb"))
+        print(f'Saved model as {modelname}')
 
     return avg_loss
 
@@ -87,7 +164,7 @@ def hyperparameter_search(start, end, stride):
     print(params)
     print(loss_per_param)
 
-#predict(max_depth=6)
-predict(n_neighbors=310)
+# predict(max_depth=6)
+predict(n_neighbors=200)
 
-# hyperparameter_search(4, 120, 4)
+# hyperparameter_search(221, 321, 20)

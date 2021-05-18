@@ -9,7 +9,7 @@ import pickle
 from statistics import mean
 
 CROSS_VAL = 10
-FEATURE_TYPE = "embeddings-trill"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
+FEATURE_TYPE = "feature-streams"  # embeddings-ge2e, embeddings-trill, feature-streams (embeddings dir name)
 FEATURE_DIR = "split-10"  # split-10, ... (subdir name in ./wavs)
 
 def predict(save_predictions=False, n_neighbors=310, max_depth=20, method='KNN'):
@@ -48,7 +48,11 @@ def predict(save_predictions=False, n_neighbors=310, max_depth=20, method='KNN')
             rf.fit(x_train, y_train)
             prediction = rf.predict(x_val)
 
-        loss = mean_squared_error(y_val, prediction)
+        # loss = mean_squared_error(y_val, prediction)
+        # use line below to simulate guessing 0.5
+        # loss = mean_squared_error(y_val, np.array([0.5]*len(y_val)))
+        # use line below to simulate random guessing
+        loss = mean_squared_error(y_val, np.random.uniform(0, 1, [len(y_val)]))
 
         print(f'MSE for fold {i}: {loss}\n')
 
@@ -93,8 +97,11 @@ def hyperparameter_search(start, end, stride, method):
         loss_per_param += [avg_loss]
     print(params)
     print(loss_per_param)
+    print(min(loss_per_param))
+    print(loss_per_param.index(min(loss_per_param)))
+    print(params[loss_per_param.index(min(loss_per_param))])
 
 # predict(max_depth=2)
-# predict(save_predictions=True, n_neighbors=310, method='KNN')
+# predict(save_predictions=False, n_neighbors=120, method='KNN')
 
 hyperparameter_search(1, 20, 1, 'RF')

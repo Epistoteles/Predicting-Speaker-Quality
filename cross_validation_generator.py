@@ -13,7 +13,7 @@ np.set_printoptions(precision=3)
 
 # As some speakers have spoken up to 160 articles, they would dominate some train/test sets.
 # For this reason we select a maximum of MAX_PER_SPEAKER random samples per speaker.
-MAX_PER_SPEAKER = 100
+MAX_PER_SPEAKER = 10  # default = 100
 
 
 def load_feature_stream(dataset, path, timeseries):
@@ -31,6 +31,7 @@ def load_feature_stream(dataset, path, timeseries):
     shimmer = pd.read_csv(f'{path}.shimmer', delimiter=' ', header=None)
 
     # concatenate values into one dataframe
+    # indices: ffv 0-6, hnr 7, jitter 8, lfbank 9-34, mfc 35-47, pitch_esps 48, shimmer 49
     feat_stream = pd.concat([ffv, hnr, jitter, lfbank, mfc, pitch_esps, shimmer], axis=1)
 
     # the features have different lengths, so cut them off at the minimum length
@@ -57,6 +58,9 @@ def load_samples(feature_type, dataset, timeseries):
     # get qualities for each speaker
     speaker_to_quality_dict = pickle.load(open('speaker_to_quality_dict.pickle', 'rb'))
 
+    # get sex for each speaker
+    speaker_to_sex_dict = pickle.load(open('speaker_to_sex_dict.pickle', 'rb'))
+
     # create empty sample list
     samples = []
 
@@ -66,8 +70,9 @@ def load_samples(feature_type, dataset, timeseries):
         if len(root_list) == 4:
             _, _, speaker_name, article = root_list
             speaker_quality = speaker_to_quality_dict[speaker_name]
+            speaker_sex = speaker_to_sex_dict[speaker_name]
             if speaker_name in speaker_to_quality_dict and speaker_quality >= 0:
-                speaker = Speaker(speaker_name, speaker_quality)
+                speaker = Speaker(speaker_name, speaker_quality, speaker_sex)
                 for f in files:
                     if f.endswith('.wav'):
                         section = f.split('.wav')[0]
@@ -97,7 +102,7 @@ def load_samples(feature_type, dataset, timeseries):
     return samples
 
 
-def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
+def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None, return_sex=False):
     """
     Takes in the feature type to use as well as the dataset to use
     and returns folds times a train set and val set with data and labels
@@ -163,6 +168,7 @@ def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
 
         # create empty result lists
         x_train, y_train, x_val, y_val = [], [], [], []
+        sex_train, sex_val = [], []
 
         # fill train list with up to MAX_PER_SPEAKER random samples from each speaker
         for speaker in train:
@@ -172,6 +178,7 @@ def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
                 selected_sample = speaker_samples.pop()
                 x_train += [selected_sample.feature]
                 y_train += [selected_sample.speaker.quality]
+                sex_train += [selected_sample.speaker.sex]
 
         # fill val list with up to MAX_PER_SPEAKER random samples from each speaker
         for speaker in val:
@@ -181,11 +188,15 @@ def get_folds(feature_type, dataset, timeseries=False, folds=10, seed=None):
                 selected_sample = speaker_samples.pop()
                 x_val += [selected_sample.feature]
                 y_val += [selected_sample.speaker.quality]
+                sex_val += [selected_sample.speaker.sex]
 
         print('Filled all sets x_train, y_train, x_val, y_val')
 
         # yield new sets for each next(generator) call
-        yield x_train, y_train, x_val, y_val
+        if return_sex:
+            yield x_train, y_train, x_val, y_val, sex_train, sex_val
+        else:
+            yield x_train, y_train, x_val, y_val
 
 
 def generator_test(seed):

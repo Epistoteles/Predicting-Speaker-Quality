@@ -1,6 +1,6 @@
-numpy~=1.19.4
+numpy~=1.18.5
 librosa~=0.7.2
-scipy~=1.5.2
+scipy~=1.4.1
 torch~=1.7.1
 scikit-learn~=0.23.0
 matplotlib~=3.3.3
@@ -9,7 +9,7 @@ tqdm~=4.46.1
 visdom~=0.1.8.9
 wandb~=0.10.11
 Keras~=2.4.3
-tensorflow~=2.4.0
+tensorflow~=2.3.0
 tensorflow-gpu~=2.3.0
 human_id~=0.1.0
 pandas~=1.1.4

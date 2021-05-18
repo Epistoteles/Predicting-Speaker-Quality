@@ -35,7 +35,7 @@ def load_features(feature_type, timeseries=False, dataset='demo'):
                 elif feature_type == 'feature-streams':
                     feat_stream = load_feature_stream(dataset,
                                                       os.path.join(root.replace('wavs/', f'{feature_type}/'),
-                                                                   f'{section}'))
+                                                                   f'{section}'), timeseries)
                     features.append(feat_stream if timeseries else np.mean(feat_stream, axis=0))
             filenames.append(f)
     return features, filenames, len(features) * [-1]
@@ -49,12 +49,12 @@ def predict_speakers(feature_type, model=None, timeseries=False, dataset='demo')
     features, filenames, truths = load_features(feature_type, timeseries, dataset)
     if model is None:
         models = os.listdir('models/')
-        models = sorted([m for m in models if m.startswith(f"{feature_type}-{'LSTM' if timeseries else '0'}")],
-                        key=lambda x: float(x.split('-')[2]))
+        print(models)
+        models = sorted([m for m in models if m.startswith(f"{feature_type}-KNN")],
+                        key=lambda x: float(x.split('-')[3]))
         model = models[0]
     print(f"Loading model models/{model} ...")
-    model = load_model(f'models/{model}')
-    model.summary()
+    model = pickle.load(open(f"models/{model}", 'rb'))
     predictions = []
     print('\n')
     print('-'*100)
@@ -64,10 +64,13 @@ def predict_speakers(feature_type, model=None, timeseries=False, dataset='demo')
         # print(f'Feature: {feature}')
         # print(feature.shape)
         # print(f'Filename: {filename}')
-        prediction = model(np.array([feature, ]), training=False)
-        print(f'Prediction for {filename}: {prediction[0][0]:5f} out of 1')
-        predictions += prediction.numpy().tolist()[0]
+        prediction = model.predict(np.array(feature).reshape(1, -1))
+        print(f'Prediction for {filename}: {prediction[0]:5f} out of 1')
     print('-'*100)
 
 
-predict_speakers('embeddings-trill', dataset='demo')
+predict_speakers('embeddings-ge2e', model='embeddings-ge2e-CLASS-FULL-0.6433-give-medical-question.pickle', dataset='demo')
+# predict_speakers('embeddings-ge2e', model='embeddings-ge2e-CLASS-NOMIDDLE-0.7557-give-certain-party.pickle', dataset='demo')
+# predict_speakers('embeddings-ge2e', dataset='demo')
+
+
