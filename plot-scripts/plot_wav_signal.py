@@ -26,5 +26,5 @@ plot_b.set_xlabel('seconds')
 plot_b.set_ylabel('frequency')
 plt.xlim(0, 10)
 
-plt.savefig(f'../graphics/plots/waveform-spectrogram.png', dpi=300)
+plt.savefig(f'../plots/waveform-spectrogram.png', dpi=300)
 plt.close()

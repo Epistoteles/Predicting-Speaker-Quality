@@ -74,7 +74,7 @@ plt.axhline(y=0.1666, color='red', linestyle='--', linewidth=1)
 plt.text(6, 0.1666 + 0.002, f"'random guessing' baseline", color='red', horizontalalignment='center', fontsize=8)
 plt.axhline(y=0.0833, color='red', linestyle='--', linewidth=1)
 plt.text(6, 0.0833 + 0.002, f"'always guess 0.5' baseline", color='red', horizontalalignment='center', fontsize=8)
-plt.savefig('../graphics/plots/boxplots_exp_2_empty.png', dpi=300)
+plt.savefig('../plots/boxplots_exp_2_empty.png', dpi=300)
 
 # plot data
 boxplot = plt.boxplot(data,
@@ -104,7 +104,7 @@ plt.text(1.45, 0.01, '= avg.', fontsize=8, verticalalignment='center')
 plt.plot(2.2, 0.01, marker='o', markeredgecolor='black', markerfacecolor='.9')
 plt.text(2.35, 0.01, '= outlier', fontsize=8, verticalalignment='center')
 
-plt.savefig('../graphics/plots/boxplots_exp_2_optimistic.png', dpi=300)
+plt.savefig('../plots/boxplots_exp_2_optimistic.png', dpi=300)
 
 # plot true baselines
 plt.axhline(y=0.1569, color='red', linestyle='--', linewidth=1)
@@ -113,5 +113,5 @@ plt.axhline(y=0.0627, color='red', linestyle='--', linewidth=1)
 plt.text(2.5, 0.0627 - 0.007, f"true 'always guess 0.5' baseline: 0.0627", color='red', horizontalalignment='center', fontsize=8)
 
 # save plot
-plt.savefig('../graphics/plots/boxplots_exp_2_true.png', dpi=300)
+plt.savefig('../plots/boxplots_exp_2_true.png', dpi=300)
 plt.close()

@@ -38,7 +38,7 @@ def plot_predictions_as_histogram(predictions, truths, feature_type, dataset, ti
     plt.xlabel('predicted score')
     plt.ylabel('count')
     plt.legend('')  # (loc='upper left')
-    plt.savefig(f"../graphics/plots/prediction-histogram-{feature_type}{'-lstm' if timeseries else '-knn' if knn else '-rf' if rf else ''}.png", dpi=300, bbox_inches='tight', pad_inches=0)
+    plt.savefig(f"../plots/prediction-histogram-{feature_type}{'-lstm' if timeseries else '-knn' if knn else '-rf' if rf else ''}.png", dpi=300, bbox_inches='tight', pad_inches=0)
     plt.close()
 
 
@@ -61,7 +61,7 @@ def plot_predictions_as_density(predictions, feature_type, timeseries, knn, rf):
     plt.xlabel('predicted score', fontsize=14)
     plt.ylabel('count', fontsize=14)
     plt.legend('')  # (loc='upper left')
-    plt.savefig(f"../graphics/plots/prediction-density-{feature_type}{'-lstm' if timeseries else '-knn' if knn else '-rf' if rf else ''}.png", dpi=300, bbox_inches='tight', pad_inches=0)
+    plt.savefig(f"../plots/prediction-density-{feature_type}{'-lstm' if timeseries else '-knn' if knn else '-rf' if rf else ''}.png", dpi=300, bbox_inches='tight', pad_inches=0)
     plt.close()
 
 
@@ -93,7 +93,7 @@ def plot_predictions_as_scatterplot(predictions, truths, feature_type, timeserie
     plt.xlabel('true score', fontsize=14)
     plt.ylabel('predicted score', fontsize=14)
     plt.legend('')  # (loc='upper left')
-    plt.savefig(f"../graphics/plots/prediction-scatter-{feature_type}{'-lstm' if timeseries else '-knn' if knn else '-rf' if rf else ''}.png", dpi=300, bbox_inches='tight', pad_inches=0.1)
+    plt.savefig(f"../plots/prediction-scatter-{feature_type}{'-lstm' if timeseries else '-knn' if knn else '-rf' if rf else ''}.png", dpi=300, bbox_inches='tight', pad_inches=0.1)
     plt.close()
 
 
@@ -114,7 +114,7 @@ def plot_desired_scatterplot(truths, feature_type):
     plt.xlabel('true score')
     plt.ylabel('true score +/- normally distributed noise')
     plt.legend(loc='upper left')
-    plt.savefig(f'../graphics/plots/prediction-scatter-desired.png', dpi=300, bbox_inches='tight', pad_inches=0)
+    plt.savefig(f'../plots/prediction-scatter-desired.png', dpi=300, bbox_inches='tight', pad_inches=0)
     plt.close()
 
 

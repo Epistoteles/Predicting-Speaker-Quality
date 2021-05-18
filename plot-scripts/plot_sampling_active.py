@@ -35,5 +35,5 @@ plt.text(0.51, 730, "> 0.5\n" + "%.2f" % (sum(1 for i in ranking_diffs if i > .5
          color="black")
 plt.xlabel('ranking distance')
 plt.ylabel('count')
-plt.savefig('../graphics/plots/sampling_active.png', dpi=300)
+plt.savefig('../plots/sampling_active.png', dpi=300)
 plt.close()

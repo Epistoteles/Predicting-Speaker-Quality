@@ -35,7 +35,7 @@ plt.text(mse_trill.index(min_mse_trill)*10, min_mse_trill + 0.001, f'k={mse_tril
 plt.xlabel('k')
 plt.ylabel('mean squared error')
 plt.legend(loc='upper left')
-plt.savefig(f'../graphics/plots/knn-ks.png', dpi=300, bbox_inches='tight', pad_inches=0)
+plt.savefig(f'../plots/knn-ks.png', dpi=300, bbox_inches='tight', pad_inches=0)
 plt.close()
 
 
@@ -69,5 +69,5 @@ plt.text(mse_trill.index(min_mse_trill)+2, min_mse_trill - 0.001, f'max depth={m
 plt.xlabel('max depth')
 plt.ylabel('mean squared error')
 plt.legend(loc='upper left')
-plt.savefig(f'../graphics/plots/rf-depths.png', dpi=300, bbox_inches='tight', pad_inches=0)
+plt.savefig(f'../plots/rf-depths.png', dpi=300, bbox_inches='tight', pad_inches=0)
 plt.close()

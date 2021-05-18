@@ -104,5 +104,5 @@ plt.axhline(y=0.0627, color='dimgrey', linestyle='--', linewidth=1)
 plt.text(3, 0.0627 - 0.007, f"mediocrity guessing", color='dimgrey', horizontalalignment='center', fontsize=8)
 
 # save plot
-plt.savefig('../graphics/plots/boxplots_exp_2_thesis.png', bbox_inches='tight', dpi=300)
+plt.savefig('../plots/boxplots_exp_2_thesis.png', bbox_inches='tight', dpi=300)
 plt.close()
