@@ -18,9 +18,7 @@ german/*
 
 # ignore the generated .wav files and their directories
 # anonymized and demo .wav files cannot be generated and have to be stored
-wavs/*
-!wavs/anonymized/
-!wavs/demo/README.md
+wavs/split-10/*
 
 # ignore all features, as they can be created
 embeddings-ge2e/*
@@ -31,12 +29,12 @@ feature-streams/*
 !feature-streams/README.md
 
 # ignore all trained models
-# models/*
-# !models/README.md
+models/*
+!models/README.md
 
 # ignore all produced predictions
-# predictions/*
-# !predictions/README.md
+predictions/*
+!predictions/README.md
 
 # ignore the following files
 test.py
